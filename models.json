@@ -16,6 +16,33 @@
     ],
     "polycount": 970764,
     "software": "Gaussian Splatting"
+  },
+  {
+    "id": "purple_gem_splat",
+    "name": "Purple Gem",
+    "src": "https://github.com/VAST-Lab/gems_site/releases/download/Gems-01/Gem01.ply",
+    "thumb": "assets/thumbs/crystal_thumbnail_512.jpg",
+    "description": "Hosted externally via GitHub Releases.",
+    "author": "You",
+    "rotation": { "x": -90, "y": -90, "z": 90 },
+    "offset": { "x": -3, "y": -30, "z": 0 },
+    "date": "2026-03-04",
+    "tags": ["splat", "ply", "scan"],
+    "polycount": 970764,
+    "software": "Gaussian Splatting"
+  },
+  {
+    "id": "orange_gem_splat",
+    "name": "Orange Gem",
+    "src": "https://github.com/VAST-Lab/gems_site/releases/download/Gems-01/Gem03.ply",
+    "thumb": "assets/thumbs/crystal_thumbnail_512.jpg",
+    "description": "Hosted externally via GitHub Releases.",
+    "author": "You",
+    "rotation": { "x": -90, "y": -90, "z": 90 },
+    "offset": { "x": -3, "y": -30, "z": 0 },
+    "date": "2026-03-04",
+    "tags": ["splat", "ply", "scan"],
+    "polycount": 970764,
+    "software": "Gaussian Splatting"
   }
- 
 ]
