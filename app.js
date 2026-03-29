@@ -15,7 +15,8 @@ function normalize(s) {
 }
 
 function isSplatFile(url) {
-  const u = (url ?? "").toLowerCase();
+  if (Array.isArray(url)) url = url[0];
+  const u = (url ?? "").toString().toLowerCase();
   return (
     u.endsWith(".ply") ||
     u.endsWith(".spz") ||
@@ -94,16 +95,18 @@ function cardHTML(m) {
   // - If `thumb` is provided, show it.
   // - If no `thumb` and it's GLB/GLTF, render automatic 3D thumb (canvas).
   // - If it's a splat, show a placeholder (no auto-thumb).
+  const firstSrc = Array.isArray(m.src) ? m.src[0] : m.src;
+  
   const thumb = (m.thumb ?? "").trim();
-  const splat = isSplatFile(m.src);
-  const glbLike = !splat && (m.src ?? "").toLowerCase().match(/\.(glb|gltf)$/);
+  const splat = isSplatFile(firstSrc);
+  const glbLike = !splat && (firstSrc ?? "").toLowerCase().match(/\.(glb|gltf)$/);
   
 const thumbMarkup = thumb
   ? `<div class="thumb-wrapper">
        <img class="thumb" src="${thumb}" alt="${m.name}" loading="lazy" />
      </div>`
   : (glbLike
-      ? `<canvas class="thumb thumb3d" data-src="${m.src}" aria-label="${m.name} 3D thumbnail"></canvas>`
+      ? `<canvas class="thumb thumb3d" data-src="${firstSrc}" aria-label="${m.name} 3D thumbnail"></canvas>`
       : `<div class="thumb thumb-placeholder"><div class="ph">SPLAT</div></div>`
     );
   return `

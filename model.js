@@ -57,6 +57,7 @@ function fitCameraToObject(camera, controls, object, offset = 1.25) {
 }
 
 function isSplatFile(url) {
+  if (Array.isArray(url)) url = url[0];
   const u = (url ?? "").toLowerCase();
   return (
     u.endsWith(".ply") ||
@@ -125,11 +126,27 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
     return;
   }
 
+  const sources = Array.isArray(m.src) ? m.src : [m.src];
+  let finalSrc = sources[0];
+
+  setText("status", "Locating best source...");
+  for (const url of sources) {
+    try {
+      const res = await fetch(url, { method: "HEAD" });
+      if (res.ok) {
+        finalSrc = url;
+        break;
+      }
+    } catch (e) {
+      console.warn(`Source not available, trying next: ${url}`);
+    }
+  }
+
   // Download button ply or glb
   const downloadBtn = document.getElementById("downloadBtn");
   if (downloadBtn) {
-    downloadBtn.href = m.src;
-    downloadBtn.setAttribute("download", (m.src.split("/").pop() || "model"));
+    downloadBtn.href = finalSrc;
+    downloadBtn.setAttribute("download", (finalSrc.split("/").pop() || "model"));
   }
 
   document.title = m.name ?? "Viewer";
@@ -212,12 +229,12 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
   loader.setMeshoptDecoder(MeshoptDecoder);
 
   // Load model
-  if (isSplatFile(m.src)) {
+  if (isSplatFile(finalSrc)) {
     setText("status", "Loading splat… (large files can take a bit)");
 
     try {
   const splat = new SplatMesh({
-    url: m.src,
+    url: finalSrc,
     onLoad: (mesh) => {
 
       // Apply rotation 
@@ -277,7 +294,7 @@ if (m.offset) {
   } else {
     setText("status", "Loading…");
     loader.load(
-      m.src,
+      finalSrc,
       (gltf) => {
         const root = gltf.scene ?? gltf.scenes?.[0];
         if (!root) throw new Error("No scene in GLTF");
