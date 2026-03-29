@@ -13,7 +13,7 @@
     "offset": { "x": -3, "y": -38, "z": 0 },
     "date": "2026-03-04",
     "tags": ["splat", "ply", "scan"],
-    "polycount": 970764,
+    "polycount": 968057,
     "software": "Gaussian Splatting"
   },
   {
@@ -30,7 +30,7 @@
     "offset": { "x": 0, "y": -15, "z": 5 },
     "date": "2026-03-04",
     "tags": ["splat", "ply", "scan"],
-    "polycount": 970764,
+    "polycount": 993958,
     "software": "Gaussian Splatting"
   },
   {
