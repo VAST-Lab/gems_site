@@ -20,9 +20,9 @@
   {
     "id": "purple_gem_splat",
     "name": "Purple Gem",
-    "src": "https://github.com/VAST-Lab/gems_site/releases/download/Gems-01/Gem01.ply",
+    "src": "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/Gem01.ply",
     "thumb": "assets/thumbs/crystal_thumbnail_512.jpg",
-    "description": "Hosted externally via GitHub Releases.",
+    "description": "Hosted externally via HuggingFace.",
     "author": "You",
     "rotation": { "x": -90, "y": -90, "z": 90 },
     "offset": { "x": -3, "y": -30, "z": 0 },
@@ -34,9 +34,9 @@
   {
     "id": "orange_gem_splat",
     "name": "Orange Gem",
-    "src": "https://github.com/VAST-Lab/gems_site/releases/download/Gems-01/Gem03.ply",
+    "src": "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/Gem03.ply",
     "thumb": "assets/thumbs/crystal_thumbnail_512.jpg",
-    "description": "Hosted externally via GitHub Releases.",
+    "description": "Hosted externally via HuggingFace.",
     "author": "You",
     "rotation": { "x": -90, "y": -90, "z": 90 },
     "offset": { "x": -3, "y": -30, "z": 0 },
