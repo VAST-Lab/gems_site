@@ -5,6 +5,25 @@ import { DRACOLoader } from "https://cdn.jsdelivr.net/npm/three@0.178/examples/j
 import { MeshoptDecoder } from "https://cdn.jsdelivr.net/npm/three@0.178/examples/jsm/libs/meshopt_decoder.module.js";
 import { SplatMesh } from "https://sparkjs.dev/releases/spark/0.1.10/spark.module.js";
 
+
+function getDeviceCapabilities() {
+	// detects if a device is low-end to enable swapping assets and resolution
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl');
+    const debugInfo = gl?.getExtension('WEBGL_debug_renderer_info');
+    const renderer = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL).toLowerCase() : "";
+    
+    // check for mobile or integrated graphics
+    const isMobile = /iphone|ipad|android/i.test(navigator.userAgent);
+    const isLowPower = renderer.includes('intel') || renderer.includes('apple gpu') || renderer.includes('mali') || renderer.includes('adreno');
+
+    return {
+        isLowEnd: isMobile || isLowPower,
+        tier: (isMobile && !renderer.includes('apple')) ? 'low' : 'high'
+    };
+}
+
+
 async function loadModels() {
   const res = await fetch("models.json", { cache: "no-store" });
   if (!res.ok) throw new Error("Could not load models.json");
@@ -106,6 +125,8 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
   const canvas = document.getElementById("c");
   if (!canvas) throw new Error("Canvas #c not found");
 
+  const capabilities = getDeviceCapabilities();
+
   let models;
   try {
     models = await loadModels();
@@ -128,6 +149,12 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
 
   const sources = Array.isArray(m.src) ? m.src : [m.src];
   let finalSrc = sources[0];
+
+  // swaps to a higher performance filetype
+  if (capabilities.isLowEnd) {
+	const lightweightSrc = sources.find(url => url.endsWith('.sog') || url.endsWith('.spz'));
+	if (lightweightSrc) finalSrc = lightweightSrc;
+  }
 
   setText("status", "Locating best source...");
   for (const url of sources) {
@@ -161,11 +188,13 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
 
   const renderer = new THREE.WebGLRenderer({
     canvas,
-    antialias: true,
+    antialias: !capabilities.isLowEnd, // disables aa if low-end device
     alpha: true,
     powerPreference: "high-performance",
   });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  
+  const pixelRatio = capabilities.isLowEnd ? Math.min(window.devicePixelRatio, 1) : Math.min(window.devicePixelRatio, 2); // reduce resolution on low-end hardware
+  renderer.setPixelRatio(pixelRatio);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   const scene = new THREE.Scene();
@@ -234,7 +263,7 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
 
     try {
   const splat = new SplatMesh({
-    url: finalSrc,
+    url: finalSrc,	
     onLoad: (mesh) => {
 
       // Apply rotation 
@@ -248,14 +277,14 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
         const center = box1.getCenter(new THREE.Vector3());
 
         //  mesh center to world origin
-      mesh.position.sub(center);
+        mesh.position.sub(center);
 
-// offset 
-if (m.offset) {
-  mesh.position.x += m.offset.x ?? 0;
-  mesh.position.y += m.offset.y ?? 0;
-  mesh.position.z += m.offset.z ?? 0;
-}
+		// offset 
+		if (m.offset) {
+		  mesh.position.x += m.offset.x ?? 0;
+		  mesh.position.y += m.offset.y ?? 0;
+		  mesh.position.z += m.offset.z ?? 0;
+		}
         
 
 
