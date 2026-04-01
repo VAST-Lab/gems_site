@@ -23,6 +23,51 @@ function getDeviceCapabilities() {
     };
 }
 
+async function getPersistentSplat(url, onProgress) {
+  // creates a persistent url to a splat saved local on disk
+	
+  const cacheName = 'gem-splat-cache';
+  const cache = await caches.open(cacheName);
+  
+  // check disk cache first
+  const cachedResponse = await cache.match(url);
+  if (cachedResponse) {
+    console.log("Found in local disk cache");
+    const blob = await cachedResponse.blob();
+    return URL.createObjectURL(blob);
+  }
+
+  // fetch from hugging face with redirect handling
+  const response = await fetch(url, { redirect: 'follow' });
+  if (!response.ok) throw new Error(`HuggingFace Error: ${response.status}`);
+
+  // track progress
+  const contentLength = response.headers.get('content-length');
+  const total = parseInt(contentLength, 10);
+  let loaded = 0;
+
+  const reader = response.body.getReader();
+  const chunks = [];
+  
+  while(true) {
+    const {done, value} = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    loaded += value.length;
+    if (onProgress && total) onProgress(Math.round((loaded / total) * 100));
+  }
+
+  const fullBlob = new Blob(chunks);
+  
+  // save to disk cache for next time
+  try {
+    await cache.put(url, new Response(fullBlob));
+  } catch (e) {
+    console.warn("Storage full, loading anyway...");
+  }
+
+  return URL.createObjectURL(fullBlob);
+}
 
 async function loadModels() {
   const res = await fetch("models.json", { cache: "no-store" });
@@ -259,15 +304,22 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
 
   // Load model
   if (isSplatFile(finalSrc)) {
-    setText("status", "Loading splat… (large files can take a bit)");
+    setText("status", "Downloading Splat (200MB)... 0%");
 
     try {
-  const splat = new SplatMesh({
-    url: finalSrc,	
+	const localBlobUrl = await getPersistentSplat(finalSrc, (pct) => { 
+		setText("status", `Downloading... ${pct}%`); 
+	});
+	setText("status", "Processing Splat data...");
+	
+    const splat = new SplatMesh({
+    url: localBlobUrl,	
     onLoad: (mesh) => {
 
       // Apply rotation 
       applyModelRotation(mesh, m, { defaultSplatFix: true });
+	  
+	  URL.revokeObjectURL(localBlobUrl); // free RAM immediately (could potentially cause crashes otherwise)
 
       setText("status", "Loaded splat.");
 
