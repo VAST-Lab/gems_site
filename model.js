@@ -152,7 +152,7 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
 
   // swaps to a higher performance filetype
   if (capabilities.isLowEnd) {
-	const lightweightSrc = sources.find(url => url.endsWith('.sog') || url.endsWith('.spz'));
+	const lightweightSrc = sources.find(url => url.endsWith('.spz') || url.endsWith('.sog'));
 	if (lightweightSrc) finalSrc = lightweightSrc;
   }
 
