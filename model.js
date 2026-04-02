@@ -195,6 +195,7 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
   }
 
   const sources = Array.isArray(m.src) ? m.src : [m.src];
+  let finalSrc;
   let preferredSrc = sources[0];
 
   // tries a higher performance filetype
