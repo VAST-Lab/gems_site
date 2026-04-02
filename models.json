@@ -3,11 +3,8 @@
     "id": "purple_gem_splat",
     "name": "Purple Gem",
     "src": [
-	  "splats/purple_gem.spz",
 	  "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/purple_gem.spz",
-	  "splats/purple_gem.sog",
 	  "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/purple_gem.sog",
-	  "splats/Purple_Gem.ply",
       "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/Purple_Gem.ply"
     ],
     "thumb": "thumbs/purple_gem.jpg",
@@ -24,11 +21,8 @@
     "id": "orange_gem_splat",
     "name": "Orange Gem",
     "src": [
-	  "splats/orange_gem.spz",
 	  "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/orange_gem.spz",
-	  "splats/orange_gem.sog",
 	  "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/orange_gem.sog",
-	  "splats/Orange_Gem.ply",
       "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/Orange_Gem.ply"
     ],
     "thumb": "thumbs/orange_gem.jpg",
@@ -45,11 +39,8 @@
     "id": "white_gem_splat",
     "name": "White Gem",
     "src": [
-	  "splats/white_gem.spz",
 	  "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/white_gem.spz",
-	  "splats/white_gem.sog",
       "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/white_gem.sog",
-	  "splats/White_Gem.ply",
 	  "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/White_Gem.ply"
     ],
     "thumb": "thumbs/white_gem.jpg",
