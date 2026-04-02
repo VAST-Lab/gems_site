@@ -195,22 +195,22 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
   }
 
   const sources = Array.isArray(m.src) ? m.src : [m.src];
-  let finalSrc = sources[0];
+  let preferredSrc = sources[0];
 
-  // swaps to a higher performance filetype
+  // tries a higher performance filetype
   if (capabilities.isLowEnd) {
-	const lightweightSrc = sources.find(url => url.endsWith('.spz') || url.endsWith('.sog'));
-	if (lightweightSrc) finalSrc = lightweightSrc;
+	const preferredSrc = sources.find(url => url.endsWith('.spz') || url.endsWith('.sog'));
   }
+  
+  const checkList = [preferredSrc, ...sources.filter(s => s !== preferredSrc)]; // prioritized list of sources
 
   setText("status", "Locating best source...");
   const cache = await caches.open('gem-splat-cache');
-  for (const url of sources) {
+  for (const url of checkList) {
 	const isCached = await cache.match(url);
-	
 	if (isCached) {
 	  finalSrc = url;
-	  console.log("Found source in cache, skipping HEAD request");
+	  //console.log("Found source in cache, skipping HEAD request");
 	  break;
 	}
 	  
