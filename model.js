@@ -32,7 +32,7 @@ async function getPersistentSplat(url, onProgress) {
   // check disk cache first
   const cachedResponse = await cache.match(url);
   if (cachedResponse) {
-    console.log("Found in local disk cache");
+    console.log("Loading from local disk cache");
     const blob = await cachedResponse.blob();
     return URL.createObjectURL(blob);
   }
@@ -61,7 +61,9 @@ async function getPersistentSplat(url, onProgress) {
   
   // save to disk cache for next time
   try {
-    await cache.put(url, new Response(fullBlob));
+    await cache.put(url, new Response(fullBlob, {
+	  headers: { 'Content-Length': fullBlob.size.toString() } // displays size in devtools
+	}));
   } catch (e) {
     console.warn("Storage full, loading anyway...");
   }
@@ -202,7 +204,16 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
   }
 
   setText("status", "Locating best source...");
+  const cache = await caches.open('gem-splat-cache');
   for (const url of sources) {
+	const isCached = await cache.match(url);
+	
+	if (isCached) {
+	  finalSrc = url;
+	  console.log("Found source in cache, skipping HEAD request");
+	  break;
+	}
+	  
     try {
       const res = await fetch(url, { method: "HEAD" });
       if (res.ok) {
@@ -304,7 +315,7 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
 
   // Load model
   if (isSplatFile(finalSrc)) {
-    setText("status", "Downloading Splat (200MB)... 0%");
+    setText("status", "Downloading Splat... 0%");
 
     try {
 	const localBlobUrl = await getPersistentSplat(finalSrc, (pct) => { 
