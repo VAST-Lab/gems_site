@@ -1,0 +1,3 @@
+
+Example entry in models.json:
+  "src": "assets/splats/Test01-Clean.ply"
