@@ -101,13 +101,20 @@ function cardHTML(m) {
   const splat = isSplatFile(firstSrc);
   const glbLike = !splat && (firstSrc ?? "").toLowerCase().match(/\.(glb|gltf)$/);
   
+const color = m.badgeColor ? `style="background:${m.badgeColor}"` : "";
+const badge = `<div class="card-badge"><span ${color}></span><span ${color}></span><span ${color}></span><span ${color}></span></div>`;
+
 const thumbMarkup = thumb
   ? `<div class="thumb-wrapper">
+       ${badge}
        <img class="thumb" src="${thumb}" alt="${m.name}" loading="lazy" />
      </div>`
   : (glbLike
-      ? `<canvas class="thumb thumb3d" data-src="${firstSrc}" aria-label="${m.name} 3D thumbnail"></canvas>`
-      : `<div class="thumb thumb-placeholder"><div class="ph">SPLAT</div></div>`
+      ? `<div class="thumb-wrapper" style="position:relative;">
+           ${badge}
+           <canvas class="thumb thumb3d" data-src="${firstSrc}" aria-label="${m.name} 3D thumbnail" style="width:100%;height:100%;display:block;"></canvas>
+         </div>`
+      : `<div class="thumb thumb-placeholder">${badge}<div class="ph">SPLAT</div></div>`
     );
   return `
     <a class="card" href="${href}">
