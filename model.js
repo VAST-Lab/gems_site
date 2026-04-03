@@ -334,6 +334,8 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
 	  URL.revokeObjectURL(localBlobUrl); // free RAM immediately (could potentially cause crashes otherwise)
 
       setText("status", "Loaded splat.");
+      const ov = document.getElementById("loader-overlay");
+      if (ov) ov.style.display = "none";
 
       try {
         // 1  box AFTER rotation
@@ -401,6 +403,8 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
         ground.position.y = box.min.y - 0.02;
 
         setText("status", "Loaded model.");
+        const ov2 = document.getElementById("loader-overlay");
+        if (ov2) ov2.style.display = "none";
       },
       (ev) => {
         const pct = ev.total ? Math.round((ev.loaded / ev.total) * 100) : null;
@@ -430,6 +434,182 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
   function tick() {
     resize();
     controls.update();
+    renderer.render(scene, camera);
+    requestAnimationFrame(tick);
+  }
+  tick();
+})();
+
+// ── Globe ──────────────────────────────────────────────────────────────────
+(async () => {
+  let allModels = [];
+  try {
+    const res = await fetch("models.json", { cache: "no-store" });
+    allModels = await res.json();
+  } catch (e) { return; }
+
+  const currentId = new URL(location.href).searchParams.get("id");
+  const currentModel = allModels.find(x => x.id === currentId) ?? allModels[0];
+
+  const dimEl = document.getElementById("dimensions");
+  if (dimEl) dimEl.textContent = currentModel?.dimensions ?? "—";
+
+  const canvas = document.getElementById("globe");
+  if (!canvas) return;
+  const hasAnyLocation = allModels.some(m => m.location);
+  if (!hasAnyLocation) { canvas.style.display = "none"; return; }
+
+  const THREE_G = await import("https://cdn.jsdelivr.net/npm/three@0.178/build/three.module.js");
+
+  const SIZE = 200;
+  canvas.width = SIZE;
+  canvas.height = SIZE;
+
+  const renderer = new THREE_G.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(SIZE, SIZE, false);
+  renderer.outputColorSpace = THREE_G.SRGBColorSpace;
+
+  const scene = new THREE_G.Scene();
+  const camera = new THREE_G.PerspectiveCamera(45, 1, 0.1, 100);
+  camera.position.set(0, 0, 2.6);
+
+  const textureLoader = new THREE_G.TextureLoader();
+  textureLoader.setCrossOrigin('anonymous'); 
+
+  const landTexture = textureLoader.load(
+    "https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/textures/planets/earth_specular_2048.jpg"
+  );
+
+  const globe = new THREE_G.Mesh(
+    new THREE_G.SphereGeometry(1, 64, 64),
+    new THREE_G.MeshBasicMaterial({ color: 0xffffff }) 
+  );
+  scene.add(globe);
+
+  const land = new THREE_G.Mesh(
+    new THREE_G.SphereGeometry(1.002, 64, 64),
+    new THREE_G.MeshBasicMaterial({
+      map: landTexture,
+      color: 0xdbdbdb, 
+      transparent: true,
+      blending: THREE_G.MultiplyBlending 
+    })
+  );
+  globe.add(land);
+
+  const rim = new THREE_G.Mesh(
+    new THREE_G.SphereGeometry(1.01, 64, 64),
+    new THREE_G.MeshBasicMaterial({
+      color: 0xeeeeee,
+      side: THREE_G.BackSide,
+      transparent: true,
+      opacity: 0.3
+    })
+  );
+  scene.add(rim);
+
+  function latLngToVec3(lat, lng, r = 1.05) {
+    const phi = (90 - lat) * (Math.PI / 180);
+    const theta = (lng + 180) * (Math.PI / 180);
+    return new THREE_G.Vector3(
+      -r * Math.sin(phi) * Math.cos(theta),
+       r * Math.cos(phi),
+       r * Math.sin(phi) * Math.sin(theta)
+    );
+  }
+
+  const pinMeshes = [];
+
+  allModels.forEach(m => {
+    if (!m.location) return;
+    const pos = latLngToVec3(m.location.lat, m.location.lng);
+    const isCurrent = m.id === currentModel?.id;
+    
+    const pinColor = isCurrent ? 0xff3030 : 0xffa500; 
+    const pinMat = new THREE_G.MeshBasicMaterial({ color: pinColor });
+    
+    const head = new THREE_G.Mesh(new THREE_G.SphereGeometry(0.035, 10, 10), pinMat);
+    head.position.copy(pos.clone().normalize().multiplyScalar(1.06));
+    globe.add(head);
+
+    // Save metadata to the mesh for clicking
+    pinMeshes.push({ mesh: head, modelId: m.id, label: m.location.label, name: m.name });
+  });
+
+  if (currentModel?.location) {
+    const { lat, lng } = currentModel.location;
+    globe.rotation.y = -THREE_G.MathUtils.degToRad(lng + 180);
+    globe.rotation.x = THREE_G.MathUtils.degToRad(lat * 0.5);
+  }
+
+  const locLabel = document.getElementById("globe-location");
+  if (locLabel && currentModel?.location) locLabel.textContent = currentModel.location.label;
+
+  const raycaster = new THREE_G.Raycaster();
+  const mouse = new THREE_G.Vector2();
+
+  let isDragging = false;
+  let px = 0, py = 0;
+  let vx = 0.004, vy = 0;
+
+  canvas.addEventListener("pointerdown", e => {
+    isDragging = true;
+    px = e.clientX; py = e.clientY;
+    vx = vy = 0;
+  });
+
+  window.addEventListener("pointermove", e => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+    if (isDragging) {
+      const dx = e.clientX - px;
+      const dy = e.clientY - py;
+      px = e.clientX; py = e.clientY;
+      vx = dx * 0.008;
+      vy = dy * 0.008;
+      globe.rotation.y += vx;
+      globe.rotation.x = Math.max(-1.2, Math.min(1.2, globe.rotation.x + vy));
+    }
+
+    // Hover detection
+    raycaster.setFromCamera(mouse, camera);
+    const hits = raycaster.intersectObjects(pinMeshes.map(p => p.mesh));
+
+    if (hits.length > 0) {
+      const entry = pinMeshes.find(p => p.mesh === hits[0].object);
+      if (locLabel) locLabel.textContent = `${entry.name} — ${entry.label}`;
+      canvas.style.cursor = "pointer";
+    } else {
+      if (locLabel) locLabel.textContent = currentModel?.location?.label ?? "";
+      if (!isDragging) canvas.style.cursor = "grab";
+    }
+  });
+
+  window.addEventListener("pointerup", () => { isDragging = false; });
+
+  // 🖱️ THE CLICK NAVIGATION LOGIC
+  canvas.addEventListener("click", e => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+    const hits = raycaster.intersectObjects(pinMeshes.map(p => p.mesh));
+
+    if (hits.length > 0) {
+      const entry = pinMeshes.find(p => p.mesh === hits[0].object);
+      // Only navigate if it's a different model
+      if (entry.modelId !== currentId) {
+        window.location.href = `model.html?id=${encodeURIComponent(entry.modelId)}`;
+      }
+    }
+  });
+
+  function tick() {
+    if (!isDragging) { globe.rotation.y += vx; vx *= 0.98; }
     renderer.render(scene, camera);
     requestAnimationFrame(tick);
   }
