@@ -185,7 +185,7 @@ body{
   opacity: .92;
 }
 
-
+/* --- Supersplat-style sidebar --- */
 .shell{
   display:grid;
   grid-template-columns: 220px 1fr;
@@ -224,11 +224,11 @@ body{
 .sb-footer{ margin-top:auto; padding:12px 8px; font-size:12px; line-height:1.35; }
 .content{ min-width:0; }
 
-/* topbar align with content area */
+/* push topbar to align with content area */
 .shell .topbar{
   left:0;
 }
-/* topbar content column */
+/* make the topbar span only the content column */
 .shell .topbar{
   position: sticky;
   top:0;
@@ -237,10 +237,10 @@ body{
   grid-column: 2 / 3;
 }
 
-/* Wrap lives inside content - keep width */
+/* Wrap lives inside content now; keep padding but allow full width */
 .shell .wrap{ max-width: 1200px; }
 
-
+/* Viewer page: allow canvas to use full content column */
 .shell .viewer-topbar{
   left:220px;
 }
@@ -270,13 +270,13 @@ body{
   background: rgba(255,255,255,.10);
 }
 
-/* thumb canvas */
+/* Auto 3D thumbnail canvas */
 .thumb3d{
   background: var(--card);
   display:block;
 }
 
-/* Convert */
+/* Convert page */
 .convert-grid{
   display:grid;
   grid-template-columns: 1fr 1fr;
@@ -348,12 +348,12 @@ body{
 }
 
 
-/* Interactive thumbnail */
+/* Interactive auto 3D thumbnails */
 .thumb3d { cursor: grab; }
 .thumb3d:active { cursor: grabbing; }
 
 
-/* Splat thumb */
+/* Splat placeholder thumb */
 .thumb-placeholder{
   display:flex;
   align-items:center;
@@ -371,99 +371,4 @@ body{
   border:1px solid rgba(255,255,255,.14);
   border-radius:999px;
   background: rgba(255,255,255,.06);
-}
-
-
-/* Globe */
-.globe-row {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 0 4px;
-}
-.globe-canvas {
-  width: 200px;
-  height: 200px;
-  border-radius: 50%;
-  display: block;
-  box-shadow: 0 0 0 1px rgba(255,255,255,.08), 0 4px 24px rgba(0,0,0,.5);
-}
-.globe-location {
-  font-size: 11px;
-  color: var(--muted);
-  text-align: center;
-  min-height: 16px;
-}
-
-
-/* --- Thumbnail corner badge 2x2 for now */
-:root {
-  --thumb-badge-color: rgba(255,255,255,0.82); /* change this to any color you want */
-}
-.thumb-wrapper,
-.thumb-placeholder {
-  position: relative;
-}
-.card-badge {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 22px;
-  height: 22px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3px;
-  padding: 4px;
-  border-radius: 6px;
-  background: rgba(0,0,0,0.45);
-  pointer-events: none;
-  z-index: 2;
-}
-.card-badge span {
-  display: block;
-  border-radius: 1.5px;
-  background: var(--thumb-badge-color);
-}
-
-
-/* Pickaxe loading*/
-.loader-wrap {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-.loader-wrap canvas {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-.loader-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: rgba(11,12,16,0.82);
-  z-index: 10;
-  pointer-events: none;
-}
-.loader-pickaxe {
-  font-size: 56px;
-  animation: pickaxe-spin 0.9s linear infinite;
-  filter: drop-shadow(0 0 12px rgba(255,180,50,0.7));
-}
-@keyframes pickaxe-spin {
-  0%   { transform: rotate(-30deg); }
-  25%  { transform: rotate(30deg);  }
-  50%  { transform: rotate(-30deg); }
-  75%  { transform: rotate(30deg);  }
-  100% { transform: rotate(-30deg); }
-}
-.loader-text {
-  margin-top: 16px;
-  font-size: 13px;
-  color: var(--muted);
-  letter-spacing: 0.05em;
 }

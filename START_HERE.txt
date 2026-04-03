@@ -1,0 +1,20 @@
+START HERE (Windows + VS Code)
+
+1) Extract this zip to a NEW empty folder (do NOT paste over an old folder).
+2) Open that folder in VS Code: File -> Open Folder...
+3) Install the VS Code extension "Live Server" (by Ritwick Dey).
+4) Right-click index.html -> "Open with Live Server".
+5) If you still see errors, hard refresh: Ctrl+Shift+R and check Console: F12 -> Console.
+
+This build uses CDN imports (no npm/Vite needed). If you ever see:
+"Failed to resolve module specifier 'three'"
+that means you are not running these files, or you extracted over an old copy.
+
+
+NOTE: This version includes an importmap so Three.js example modules (GLTFLoader, OrbitControls) work in the browser.
+
+
+v4 fix: Removed 2D canvas placeholder drawing so WebGL can create the context for interactive thumbnails.
+
+
+v5 change: Viewer page auto-spins (OrbitControls autoRotate) until you interact; then pauses and resumes after ~1s of inactivity.
