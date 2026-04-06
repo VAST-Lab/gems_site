@@ -3,54 +3,109 @@
     "id": "purple_gem_splat",
     "name": "Purple Gem",
     "src": [
-	  "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/purple_gem.spz",
+      "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/purple_gem.spz",
 	  "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/purple_gem.sog",
       "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/Purple_Gem.ply"
     ],
     "thumb": "thumbs/purple_gem.jpg",
     "description": "",
     "author": "You",
-    "rotation": { "x": 90, "y": 90, "z": 90 },
-    "offset": { "x": -3, "y": -38, "z": 0 },
+    "rotation": {
+      "x": 90,
+      "y": 90,
+      "z": 90
+    },
+    "offset": {
+      "x": -3,
+      "y": -38,
+      "z": 0
+    },
     "date": "2026-03-04",
-    "tags": ["splat", "ply", "scan"],
+    "tags": [
+      "splat",
+      "ply",
+      "scan"
+    ],
     "polycount": 968057,
-    "software": "Gaussian Splatting"
+    "software": "Gaussian Splatting",
+    "location": {
+      "lat": 32.7767,
+      "lng": -96.797,
+      "label": "Dallas, Texas"
+    },
+    "dimensions": "8 x 6 x 5 cm",
+    "badgeColor": "#ff8c00"
   },
   {
     "id": "orange_gem_splat",
     "name": "Orange Gem",
     "src": [
-	  "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/orange_gem.spz",
+      "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/orange_gem.spz",
 	  "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/orange_gem.sog",
       "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/Orange_Gem.ply"
     ],
     "thumb": "thumbs/orange_gem.jpg",
     "description": "",
     "author": "You",
-    "rotation": { "x": -90, "y": -90, "z": 90 },
-    "offset": { "x": 0, "y": -15, "z": 5 },
+    "rotation": {
+      "x": -90,
+      "y": -90,
+      "z": 90
+    },
+    "offset": {
+      "x": 0,
+      "y": -15,
+      "z": 5
+    },
     "date": "2026-03-04",
-    "tags": ["splat", "ply", "scan"],
+    "tags": [
+      "splat",
+      "ply",
+      "scan"
+    ],
     "polycount": 993958,
-    "software": "Gaussian Splatting"
+    "software": "Gaussian Splatting",
+    "location": {
+      "lat": -15.7801,
+      "lng": -47.9292,
+      "label": "Bras\u00edlia, Brazil"
+    },
+    "dimensions": "9 x 7 x 6 cm"
   },
   {
     "id": "white_gem_splat",
     "name": "White Gem",
     "src": [
-	  "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/white_gem.spz",
+      "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/white_gem.spz",
       "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/white_gem.sog",
 	  "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/White_Gem.ply"
     ],
     "thumb": "thumbs/white_gem.jpg",
     "description": "",
     "author": "You",
-    "rotation": { "x": 90, "y": 90, "z": 90 },
-    "offset": { "x": 0, "y": -28, "z": 0 },
+    "rotation": {
+      "x": 90,
+      "y": 90,
+      "z": 90
+    },
+    "offset": {
+      "x": 0,
+      "y": -28,
+      "z": 0
+    },
     "date": "2026-03-04",
-    "tags": ["splat", "ply", "scan"],
+    "tags": [
+      "splat",
+      "ply",
+      "scan"
+    ],
     "polycount": 970764,
-    "software": "Gaussian Splatting"
+    "software": "Gaussian Splatting",
+    "location": {
+      "lat": 34.7465,
+      "lng": -92.2896,
+      "label": "Little Rock, Arkansas"
+    },
+    "dimensions": "11 x 8 x 7 cm"
   }
 ]
