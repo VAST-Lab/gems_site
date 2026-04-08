@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  
+  <title>Model</title>
+  
+  <link rel="icon" type="image/x-icon" href="/assets/icons/favicon.ico">
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-touch-icon.png">
+
+  <link rel="manifest" href="/assets/icons/site.webmanifest">
+  
+  <meta name="description" content="A curated library of 3D models and Gaussian Splats.">
+  <meta name="author" content="VAST Lab">
+  
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="viewer-body">
+<div class="shell">
+
+  <aside class="sidebar">
+    <div class="sb-brand">GemScans Library</div>
+        <nav class="sb-nav">
+      <a class="sb-item sb-item-on" href="index.html">Explore</a>
+      <a class="sb-item" href="convert.html">Convert</a>
+      <a class="sb-item" href="index.html">Manage</a>
+      <a class="sb-item" href="index.html">Upload</a>
+      <a class="sb-item" href="index.html">Settings</a>
+    </nav>
+    <div class="sb-footer muted">Tip: add models in<br><code>assets/models</code></div>
+  </aside>
+
+  <div class="content">
+  <header class="viewer-topbar">
+    <a class="back" href="index.html">← Back</a>
+    <div class="viewer-title" id="title">Loading…</div>
+  </header>
+
+  <main class="viewer-main">
+    <div id="loader-wrap" class="loader-wrap">
+  <canvas id="c"></canvas>
+  <div id="loader-overlay" class="loader-overlay">
+    <div class="loader-pickaxe">⛏</div>
+    <div class="loader-text">Loading gem…</div>
+    <div class="loader-progress" aria-hidden="true">
+      <div id="loader-progress-bar" class="loader-progress-bar"></div>
+    </div>
+    <div id="loader-progress-label" class="loader-progress-label">0%</div>
+  </div>
+</div>
+
+    <aside class="panel">
+      <h2 id="name">Loading…</h2>
+     <div class="desc-box">
+  <div class="desc-label">Description</div>
+  <p id="desc" class="desc-body">Description goes here</p>
+</div>
+      <p class="muted" id="status"></p>
+
+    <a id="downloadBtn" class="btn" href="#" download>Download PLY</a>
+
+      <div class="meta">
+        <div><span class="k">Author</span><span id="author"></span></div>
+        <div><span class="k">Gem Dimensions</span><span id="dimensions"></span></div>
+        <div class="globe-row">
+          <canvas id="globe" class="globe-canvas"></canvas>
+          <div id="globe-location" class="globe-location"></div>
+        </div>
+        <div><span class="k">Date</span><span id="date"></span></div>
+        <div><span class="k">Software</span><span id="software"></span></div>
+        <div><span class="k">Polycount</span><span id="polycount"></span></div>
+      </div>
+
+      <div class="filters-row" style="margin-top:14px;">
+        <div class="filters-title">Tags</div>
+        <div id="tags" class="chips"></div>
+      </div>
+
+      <div class="small" style="margin-top:14px;">
+        Drag to rotate • scroll to zoom • right-drag to pan
+      </div>
+    </aside>
+  </main>
+
+  <script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.178/build/three.module.js"
+  }
+}
+</script>
+
+<script type="module" src="model.js"></script>
+  </div>
+</div>
+</body>
+</html>

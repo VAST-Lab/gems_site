@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Convert</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="sb-brand">My Library</div>
+    <nav class="sb-nav">
+      <a class="sb-item" href="index.html">Explore</a>
+      <a class="sb-item sb-item-on" href="convert.html">Convert</a>
+      <a class="sb-item" href="index.html">Manage</a>
+      <a class="sb-item" href="index.html">Upload</a>
+      <a class="sb-item" href="index.html">Settings</a>
+    </nav>
+    <div class="sb-footer muted">Drop a GLB/GLTF and export as GLB or glTF.</div>
+  </aside>
+
+  <div class="content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="brand">Convert</div>
+        <div class="muted">Transform and convert models in your browser — no uploads.</div>
+      </div>
+      <div class="topbar-right"></div>
+    </header>
+
+    <main class="wrap">
+      <div class="convert-grid">
+        <section class="convert-card">
+          <h3>Input Files</h3>
+          <div id="drop" class="dropzone" tabindex="0" role="button" aria-label="Upload model">
+            <div class="drop-icon">⬆</div>
+            <div class="drop-title">Drag & drop model files here</div>
+            <div class="muted">or click to browse</div>
+            <div class="drop-types muted">.glb, .gltf</div>
+            <input id="file" class="file" type="file" accept=".glb,.gltf,model/gltf-binary,model/gltf+json" />
+          </div>
+          <div id="inputInfo" class="muted" style="margin-top:10px;"></div>
+        </section>
+
+        <section class="convert-card">
+          <h3>Output</h3>
+
+          <label class="field">
+            <div class="field-label">Format</div>
+            <select id="format" class="select">
+              <option value="glb">.glb (binary)</option>
+              <option value="gltf">.gltf (JSON + .bin)</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <div class="field-label">Filename</div>
+            <input id="filename" class="input" value="output" />
+          </label>
+
+          <div class="muted" style="margin-top:10px;">OUTPUT ACTIONS</div>
+          <div class="muted" style="margin-top:6px;">Applied to the result before export</div>
+          <div class="muted" style="margin:10px 0 10px;">No actions added</div>
+
+          <button id="addAction" class="btn btn-ghost">＋ Add Action</button>
+
+          <button id="convert" class="btn btn-primary" style="margin-top:12px;" disabled>Convert & Download</button>
+
+          <div id="status" class="muted" style="margin-top:10px;"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.161/build/three.module.js"
+  }
+}
+</script>
+
+<script type="module" src="convert.js"></script>
+</body>
+</html>
