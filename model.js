@@ -100,6 +100,24 @@ function addTagChips(tags) {
   }
 }
 
+const loaderBar = document.getElementById("loader-progress-bar");
+const loaderLabel = document.getElementById("loader-progress-label");
+const loaderOverlay = document.getElementById("loader-overlay");
+
+function setLoaderProgress(value) {
+  const pct = Math.max(0, Math.min(100, Math.round(value ?? 0)));
+  if (loaderBar) loaderBar.style.width = `${pct}%`;
+  if (loaderLabel) loaderLabel.textContent = `${pct}%`;
+}
+
+function hideLoaderOverlay(delay = 180) {
+  setLoaderProgress(100);
+  if (!loaderOverlay) return;
+  window.setTimeout(() => {
+    loaderOverlay.style.display = "none";
+  }, delay);
+}
+
 function fitCameraToObject(camera, controls, object, offset = 1.25) {
   const box = new THREE.Box3().setFromObject(object);
   const size = box.getSize(new THREE.Vector3());
@@ -198,6 +216,8 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
   let finalSrc;
   let preferredSrc = sources[0];
 
+  setLoaderProgress(5);
+
   // tries a higher performance filetype
   if (capabilities.isLowEnd) {
 	const preferredSrc = sources.find(url => url.endsWith('.spz') || url.endsWith('.sog'));
@@ -205,6 +225,7 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
   
   const checkList = [preferredSrc, ...sources.filter(s => s !== preferredSrc)]; // prioritized list of sources
 
+  setLoaderProgress(12);
   setText("status", "Locating best source...");
   const cache = await caches.open('gem-splat-cache');
   for (const url of checkList) {
@@ -233,6 +254,8 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
     downloadBtn.setAttribute("download", (finalSrc.split("/").pop() || "model"));
   }
 
+  setLoaderProgress(25);
+
   document.title = m.name ?? "Viewer";
   setText("title", m.name);
   setText("name", m.name);
@@ -242,6 +265,8 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
   setText("software", m.software);
   setText("polycount", (m.polycount ?? "").toString());
   addTagChips(m.tags);
+
+  setLoaderProgress(35);
 
   const renderer = new THREE.WebGLRenderer({
     canvas,
@@ -307,6 +332,8 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
   ground.position.y = -9999;
   scene.add(ground);
 
+  setLoaderProgress(45);
+
   // GLTF loader setup
   const loader = new GLTFLoader();
   const draco = new DRACOLoader();
@@ -316,12 +343,15 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
 
   // Load model
   if (isSplatFile(finalSrc)) {
+    setLoaderProgress(50);
     setText("status", "Downloading Splat... 0%");
 
     try {
 	const localBlobUrl = await getPersistentSplat(finalSrc, (pct) => { 
 		setText("status", `Downloading... ${pct}%`); 
+		setLoaderProgress(50 + Math.round(pct * 0.35));
 	});
+	setLoaderProgress(88);
 	setText("status", "Processing Splat data...");
 	
     const splat = new SplatMesh({
@@ -334,8 +364,7 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
 	  URL.revokeObjectURL(localBlobUrl); // free RAM immediately (could potentially cause crashes otherwise)
 
       setText("status", "Loaded splat.");
-      const ov = document.getElementById("loader-overlay");
-      if (ov) ov.style.display = "none";
+      hideLoaderOverlay();
 
       try {
         // 1  box AFTER rotation
@@ -387,6 +416,7 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
       return;
     }
   } else {
+    setLoaderProgress(55);
     setText("status", "Loading…");
     loader.load(
       finalSrc,
@@ -402,12 +432,13 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
         const box = fitCameraToObject(camera, controls, root, 1.25);
         ground.position.y = box.min.y - 0.02;
 
+        setLoaderProgress(100);
         setText("status", "Loaded model.");
-        const ov2 = document.getElementById("loader-overlay");
-        if (ov2) ov2.style.display = "none";
+        hideLoaderOverlay();
       },
       (ev) => {
         const pct = ev.total ? Math.round((ev.loaded / ev.total) * 100) : null;
+        if (pct !== null) setLoaderProgress(55 + Math.round(pct * 0.45));
         setText("status", pct ? `Loading… ${pct}%` : "Loading…");
       },
       (err) => {
@@ -483,17 +514,17 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
 
   const globe = new THREE_G.Mesh(
     new THREE_G.SphereGeometry(1, 64, 64),
-    new THREE_G.MeshBasicMaterial({ color: 0xffffff }) 
+    new THREE_G.MeshBasicMaterial({ color: 0xababab }) 
   );
   scene.add(globe);
 
   const land = new THREE_G.Mesh(
     new THREE_G.SphereGeometry(1.002, 64, 64),
     new THREE_G.MeshBasicMaterial({
-      map: landTexture,
-      color: 0xdbdbdb, 
+      alphaMap: landTexture,
+      color: 0xffffff, 
       transparent: true,
-      blending: THREE_G.MultiplyBlending 
+      opacity: 1.0 
     })
   );
   globe.add(land);
