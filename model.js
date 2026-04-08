@@ -483,7 +483,7 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
 
   const globe = new THREE_G.Mesh(
     new THREE_G.SphereGeometry(1, 64, 64),
-    new THREE_G.MeshBasicMaterial({ color: 0xffffff }) 
+    new THREE_G.MeshBasicMaterial({ color: 0xababab }) 
   );
   scene.add(globe);
 
@@ -491,7 +491,7 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
     new THREE_G.SphereGeometry(1.002, 64, 64),
     new THREE_G.MeshBasicMaterial({
       alphaMap: landTexture,
-      color: 0xababab, 
+      color: 0xffffff, 
       transparent: true,
       opacity: 1.0 
     })
