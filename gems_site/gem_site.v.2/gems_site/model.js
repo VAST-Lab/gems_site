@@ -23,53 +23,6 @@ function getDeviceCapabilities() {
     };
 }
 
-async function getPersistentSplat(url, onProgress) {
-  // creates a persistent url to a splat saved local on disk
-	
-  const cacheName = 'gem-splat-cache';
-  const cache = await caches.open(cacheName);
-  
-  // check disk cache first
-  const cachedResponse = await cache.match(url);
-  if (cachedResponse) {
-    console.log("Loading from local disk cache");
-    const blob = await cachedResponse.blob();
-    return URL.createObjectURL(blob);
-  }
-
-  // fetch from hugging face with redirect handling
-  const response = await fetch(url, { redirect: 'follow' });
-  if (!response.ok) throw new Error(`HuggingFace Error: ${response.status}`);
-
-  // track progress
-  const contentLength = response.headers.get('content-length');
-  const total = parseInt(contentLength, 10);
-  let loaded = 0;
-
-  const reader = response.body.getReader();
-  const chunks = [];
-  
-  while(true) {
-    const {done, value} = await reader.read();
-    if (done) break;
-    chunks.push(value);
-    loaded += value.length;
-    if (onProgress && total) onProgress(Math.round((loaded / total) * 100));
-  }
-
-  const fullBlob = new Blob(chunks);
-  
-  // save to disk cache for next time
-  try {
-    await cache.put(url, new Response(fullBlob, {
-	  headers: { 'Content-Length': fullBlob.size.toString() } // displays size in devtools
-	}));
-  } catch (e) {
-    console.warn("Storage full, loading anyway...");
-  }
-
-  return URL.createObjectURL(fullBlob);
-}
 
 async function loadModels() {
   const res = await fetch("models.json", { cache: "no-store" });
@@ -195,26 +148,16 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
   }
 
   const sources = Array.isArray(m.src) ? m.src : [m.src];
-  let finalSrc;
-  let preferredSrc = sources[0];
+  let finalSrc = sources[0];
 
-  // tries a higher performance filetype
+  // swaps to a higher performance filetype
   if (capabilities.isLowEnd) {
-	const preferredSrc = sources.find(url => url.endsWith('.spz') || url.endsWith('.sog'));
+	const lightweightSrc = sources.find(url => url.endsWith('.spz') || url.endsWith('.sog'));
+	if (lightweightSrc) finalSrc = lightweightSrc;
   }
-  
-  const checkList = [preferredSrc, ...sources.filter(s => s !== preferredSrc)]; // prioritized list of sources
 
   setText("status", "Locating best source...");
-  const cache = await caches.open('gem-splat-cache');
-  for (const url of checkList) {
-	const isCached = await cache.match(url);
-	if (isCached) {
-	  finalSrc = url;
-	  //console.log("Found source in cache, skipping HEAD request");
-	  break;
-	}
-	  
+  for (const url of sources) {
     try {
       const res = await fetch(url, { method: "HEAD" });
       if (res.ok) {
@@ -316,22 +259,15 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
 
   // Load model
   if (isSplatFile(finalSrc)) {
-    setText("status", "Downloading Splat... 0%");
+    setText("status", "Loading splat… (large files can take a bit)");
 
     try {
-	const localBlobUrl = await getPersistentSplat(finalSrc, (pct) => { 
-		setText("status", `Downloading... ${pct}%`); 
-	});
-	setText("status", "Processing Splat data...");
-	
-    const splat = new SplatMesh({
-    url: localBlobUrl,	
+  const splat = new SplatMesh({
+    url: finalSrc,	
     onLoad: (mesh) => {
 
       // Apply rotation 
       applyModelRotation(mesh, m, { defaultSplatFix: true });
-	  
-	  URL.revokeObjectURL(localBlobUrl); // free RAM immediately (could potentially cause crashes otherwise)
 
       setText("status", "Loaded splat.");
       const ov = document.getElementById("loader-overlay");
@@ -442,18 +378,22 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
 
 // ── Globe ──────────────────────────────────────────────────────────────────
 (async () => {
+ 
   let allModels = [];
   try {
     const res = await fetch("models.json", { cache: "no-store" });
     allModels = await res.json();
   } catch (e) { return; }
 
+
   const currentId = new URL(location.href).searchParams.get("id");
   const currentModel = allModels.find(x => x.id === currentId) ?? allModels[0];
 
+  
   const dimEl = document.getElementById("dimensions");
   if (dimEl) dimEl.textContent = currentModel?.dimensions ?? "—";
 
+  // if the model has a location 
   const canvas = document.getElementById("globe");
   if (!canvas) return;
   const hasAnyLocation = allModels.some(m => m.location);
@@ -462,7 +402,7 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
   const THREE_G = await import("https://cdn.jsdelivr.net/npm/three@0.178/build/three.module.js");
 
   const SIZE = 200;
-  canvas.width = SIZE;
+  canvas.width  = SIZE;
   canvas.height = SIZE;
 
   const renderer = new THREE_G.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -470,47 +410,54 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
   renderer.setSize(SIZE, SIZE, false);
   renderer.outputColorSpace = THREE_G.SRGBColorSpace;
 
-  const scene = new THREE_G.Scene();
+  const scene  = new THREE_G.Scene();
   const camera = new THREE_G.PerspectiveCamera(45, 1, 0.1, 100);
   camera.position.set(0, 0, 2.6);
 
-  const textureLoader = new THREE_G.TextureLoader();
-  textureLoader.setCrossOrigin('anonymous'); 
+  
+  scene.add(new THREE_G.AmbientLight(0xffffff, 0.35));
+  const sun = new THREE_G.DirectionalLight(0xfff4e0, 1.4);
+  sun.position.set(5, 3, 5);
+  scene.add(sun);
 
-  const landTexture = textureLoader.load(
-    "https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/textures/planets/earth_specular_2048.jpg"
-  );
+  // Globe 
+  const geo  = new THREE_G.SphereGeometry(1, 64, 64);
 
-  const globe = new THREE_G.Mesh(
-    new THREE_G.SphereGeometry(1, 64, 64),
-    new THREE_G.MeshBasicMaterial({ color: 0xffffff }) 
-  );
+  //  NASA earth texture (CORS-safe, from Three.js repo)
+  const loadTex = (url) => new Promise(resolve => {
+    new THREE_G.TextureLoader().load(url, resolve, undefined, () => resolve(null));
+  });
+
+  const earthTex =
+    await loadTex("https://raw.githubusercontent.com/mrdoob/three.js/r161/examples/textures/planets/earth_atmos_2048.jpg") ||
+    await loadTex("https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg") ||
+    null;
+
+  const mat = earthTex
+    ? new THREE_G.MeshPhongMaterial({
+        map: earthTex,
+        specular: new THREE_G.Color(0x224488),
+        shininess: 28,
+      })
+    : new THREE_G.MeshPhongMaterial({ color: 0x1a6b3a, shininess: 10 });
+
+  const globe = new THREE_G.Mesh(geo, mat);
   scene.add(globe);
 
-  const land = new THREE_G.Mesh(
-    new THREE_G.SphereGeometry(1.002, 64, 64),
-    new THREE_G.MeshBasicMaterial({
-      map: landTexture,
-      color: 0xdbdbdb, 
-      transparent: true,
-      blending: THREE_G.MultiplyBlending 
-    })
-  );
-  globe.add(land);
 
-  const rim = new THREE_G.Mesh(
-    new THREE_G.SphereGeometry(1.01, 64, 64),
-    new THREE_G.MeshBasicMaterial({
-      color: 0xeeeeee,
-      side: THREE_G.BackSide,
-      transparent: true,
-      opacity: 0.3
-    })
-  );
-  scene.add(rim);
+  const atmGeo = new THREE_G.SphereGeometry(1.045, 64, 64);
+  const atmMat = new THREE_G.MeshPhongMaterial({
+    color: 0x4488ff,
+    transparent: true,
+    opacity: 0.10,
+    side: THREE_G.FrontSide,
+    depthWrite: false,
+  });
+  scene.add(new THREE_G.Mesh(atmGeo, atmMat));
 
+  
   function latLngToVec3(lat, lng, r = 1.05) {
-    const phi = (90 - lat) * (Math.PI / 180);
+    const phi   = (90 - lat)  * (Math.PI / 180);
     const theta = (lng + 180) * (Math.PI / 180);
     return new THREE_G.Vector3(
       -r * Math.sin(phi) * Math.cos(theta),
@@ -519,97 +466,128 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
     );
   }
 
-  const pinMeshes = [];
+  // Build pins for all models that have a location
+  const pinMeshes = []; // { mesh, modelId, label }
 
-  allModels.forEach(m => {
-    if (!m.location) return;
+  for (const m of allModels) {
+    if (!m.location) continue;
     const pos = latLngToVec3(m.location.lat, m.location.lng);
+
+    // Pin
+    const pinGeo  = new THREE_G.CylinderGeometry(0.012, 0.012, 0.12, 8);
     const isCurrent = m.id === currentModel?.id;
+    const pinMat  = new THREE_G.MeshPhongMaterial({
+      color: isCurrent ? 0xff3030 : 0xff8c00,
+      emissive: isCurrent ? 0x880000 : 0x553300,
+    });
+    const pin = new THREE_G.Mesh(pinGeo, pinMat);
+
+  
+    pin.position.copy(pos);
+    pin.quaternion.setFromUnitVectors(
+      new THREE_G.Vector3(0, 1, 0),
+      pos.clone().normalize()
+    );
+
     
-    const pinColor = isCurrent ? 0xff3030 : 0xffa500; 
-    const pinMat = new THREE_G.MeshBasicMaterial({ color: pinColor });
-    
-    const head = new THREE_G.Mesh(new THREE_G.SphereGeometry(0.035, 10, 10), pinMat);
-    head.position.copy(pos.clone().normalize().multiplyScalar(1.06));
+    const headGeo = new THREE_G.SphereGeometry(0.032, 10, 10);
+    const head    = new THREE_G.Mesh(headGeo, pinMat);
+    const headDir = pos.clone().normalize().multiplyScalar(1.13);
+    head.position.copy(headDir);
+
+    globe.add(pin);
     globe.add(head);
 
-    // Save metadata to the mesh for clicking
     pinMeshes.push({ mesh: head, modelId: m.id, label: m.location.label, name: m.name });
-  });
-
-  if (currentModel?.location) {
-    const { lat, lng } = currentModel.location;
-    globe.rotation.y = -THREE_G.MathUtils.degToRad(lng + 180);
-    globe.rotation.x = THREE_G.MathUtils.degToRad(lat * 0.5);
   }
 
-  const locLabel = document.getElementById("globe-location");
-  if (locLabel && currentModel?.location) locLabel.textContent = currentModel.location.label;
+  // Orient globe so Texas faces camera to start
+  if (currentModel?.location) {
+    const lat = currentModel.location.lat;
+    const lng = currentModel.location.lng;
+    globe.rotation.y = -THREE_G.MathUtils.degToRad(lng + 180);
+    globe.rotation.x =  THREE_G.MathUtils.degToRad(lat * 0.5);
+  }
 
-  const raycaster = new THREE_G.Raycaster();
-  const mouse = new THREE_G.Vector2();
-
+  // Drag to rotate
   let isDragging = false;
-  let px = 0, py = 0;
-  let vx = 0.004, vy = 0;
+  let prevX = 0, prevY = 0;
+  let velX = 0.004, velY = 0;
 
   canvas.addEventListener("pointerdown", e => {
     isDragging = true;
-    px = e.clientX; py = e.clientY;
-    vx = vy = 0;
+    prevX = e.clientX;
+    prevY = e.clientY;
+    velX = velY = 0;
+    canvas.setPointerCapture?.(e.pointerId);
+    canvas.style.cursor = "grabbing";
+  });
+  canvas.addEventListener("pointermove", e => {
+    if (!isDragging) return;
+    const dx = e.clientX - prevX;
+    const dy = e.clientY - prevY;
+    prevX = e.clientX;
+    prevY = e.clientY;
+    velX = dx * 0.008;
+    velY = dy * 0.008;
+    globe.rotation.y += velX;
+    globe.rotation.x = Math.max(-1.2, Math.min(1.2, globe.rotation.x + velY));
+  });
+  canvas.addEventListener("pointerup",     () => { isDragging = false; canvas.style.cursor = "grab"; });
+  canvas.addEventListener("pointercancel", () => { isDragging = false; canvas.style.cursor = "grab"; });
+  canvas.style.cursor = "grab";
+
+  // Click on pin go to that gem
+  const raycaster = new THREE_G.Raycaster();
+  const mouse     = new THREE_G.Vector2();
+  canvas.addEventListener("click", e => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x =  ((e.clientX - rect.left)  / rect.width)  * 2 - 1;
+    mouse.y = -((e.clientY - rect.top)   / rect.height) * 2 + 1;
+    raycaster.setFromCamera(mouse, camera);
+    const heads = pinMeshes.map(p => p.mesh);
+    const hits  = raycaster.intersectObjects(heads, false);
+    if (hits.length > 0) {
+      const hit   = hits[0].object;
+      const entry = pinMeshes.find(p => p.mesh === hit);
+      if (entry && entry.modelId !== currentModel?.id) {
+        window.location.href = `model.html?id=${encodeURIComponent(entry.modelId)}`;
+      }
+    }
   });
 
-  window.addEventListener("pointermove", e => {
+  // Hover tooltip
+  const locLabel = document.getElementById("globe-location");
+  canvas.addEventListener("mousemove", e => {
     const rect = canvas.getBoundingClientRect();
-    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-
-    if (isDragging) {
-      const dx = e.clientX - px;
-      const dy = e.clientY - py;
-      px = e.clientX; py = e.clientY;
-      vx = dx * 0.008;
-      vy = dy * 0.008;
-      globe.rotation.y += vx;
-      globe.rotation.x = Math.max(-1.2, Math.min(1.2, globe.rotation.x + vy));
-    }
-
-    // Hover detection
+    mouse.x =  ((e.clientX - rect.left)  / rect.width)  * 2 - 1;
+    mouse.y = -((e.clientY - rect.top)   / rect.height) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
-    const hits = raycaster.intersectObjects(pinMeshes.map(p => p.mesh));
-
+    const heads = pinMeshes.map(p => p.mesh);
+    const hits  = raycaster.intersectObjects(heads, false);
     if (hits.length > 0) {
       const entry = pinMeshes.find(p => p.mesh === hits[0].object);
-      if (locLabel) locLabel.textContent = `${entry.name} — ${entry.label}`;
-      canvas.style.cursor = "pointer";
+      if (entry && locLabel) {
+        locLabel.textContent = `${entry.name} — ${entry.label}`;
+        canvas.style.cursor = "pointer";
+      }
     } else {
       if (locLabel) locLabel.textContent = currentModel?.location?.label ?? "";
       if (!isDragging) canvas.style.cursor = "grab";
     }
   });
 
-  window.addEventListener("pointerup", () => { isDragging = false; });
+  // Set location label
+  if (locLabel && currentModel?.location) {
+    locLabel.textContent = currentModel.location.label;
+  }
 
-  // 🖱️ THE CLICK NAVIGATION LOGIC
-  canvas.addEventListener("click", e => {
-    const rect = canvas.getBoundingClientRect();
-    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-
-    raycaster.setFromCamera(mouse, camera);
-    const hits = raycaster.intersectObjects(pinMeshes.map(p => p.mesh));
-
-    if (hits.length > 0) {
-      const entry = pinMeshes.find(p => p.mesh === hits[0].object);
-      // Only navigate if it's a different model
-      if (entry.modelId !== currentId) {
-        window.location.href = `model.html?id=${encodeURIComponent(entry.modelId)}`;
-      }
-    }
-  });
-
+  // Render loop
   function tick() {
-    if (!isDragging) { globe.rotation.y += vx; vx *= 0.98; }
+    if (!isDragging) {
+      globe.rotation.y += velX;
+      velX *= 0.97; // friction
+    }
     renderer.render(scene, camera);
     requestAnimationFrame(tick);
   }

@@ -1,0 +1,2 @@
+Put your thumbnail .jpg/.png files in this folder.
+Example: robot_head.jpg
