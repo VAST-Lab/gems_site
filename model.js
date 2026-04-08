@@ -490,10 +490,10 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
   const land = new THREE_G.Mesh(
     new THREE_G.SphereGeometry(1.002, 64, 64),
     new THREE_G.MeshBasicMaterial({
-      map: landTexture,
-      color: 0xdbdbdb, 
+      alphaMap: landTexture,
+      color: 0xababab, 
       transparent: true,
-      blending: THREE_G.MultiplyBlending 
+      opacity: 1.0 
     })
   );
   globe.add(land);
