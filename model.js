@@ -265,6 +265,28 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
   setText("software", m.software);
   setText("polycount", (m.polycount ?? "").toString());
   addTagChips(m.tags);
+  renderCompoundBadges(m.compounds);
+  function renderCompoundBadges(compounds) {
+const host = document.getElementById("compoundBadges");
+if (!host) return;
+
+host.innerHTML = "";
+
+if (!Array.isArray(compounds) || compounds.length === 0) {
+host.style.display = "none";
+return;
+}
+
+host.style.display = "flex";
+
+for (const item of compounds) {
+const badge = document.createElement("div");
+badge.className = "compound-badge";
+badge.textContent = item.label ?? "";
+if (item.value) badge.title = `${item.label}: ${item.value}`;
+host.appendChild(badge);
+}
+}
 
   setLoaderProgress(35);
 
@@ -512,33 +534,27 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
     "https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/textures/planets/earth_specular_2048.jpg"
   );
 
+  // note: adjust border color in `styles.css` in ".globe-canvas"
+  // this is done because the alphaMap's transparency causes render order problems
+
   const globe = new THREE_G.Mesh(
     new THREE_G.SphereGeometry(1, 64, 64),
-    new THREE_G.MeshBasicMaterial({ color: 0xababab }) 
+    new THREE_G.MeshBasicMaterial({ color: 0x525252 }) 
   );
+  globe.renderOrder = 1;
   scene.add(globe);
 
   const land = new THREE_G.Mesh(
     new THREE_G.SphereGeometry(1.002, 64, 64),
     new THREE_G.MeshBasicMaterial({
       alphaMap: landTexture,
-      color: 0xffffff, 
+      color: 0x12141c, 
       transparent: true,
       opacity: 1.0 
     })
   );
+  globe.renderOrder = 2;
   globe.add(land);
-
-  const rim = new THREE_G.Mesh(
-    new THREE_G.SphereGeometry(1.01, 64, 64),
-    new THREE_G.MeshBasicMaterial({
-      color: 0xeeeeee,
-      side: THREE_G.BackSide,
-      transparent: true,
-      opacity: 0.3
-    })
-  );
-  scene.add(rim);
 
   function latLngToVec3(lat, lng, r = 1.05) {
     const phi = (90 - lat) * (Math.PI / 180);
@@ -557,7 +573,7 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
     const pos = latLngToVec3(m.location.lat, m.location.lng);
     const isCurrent = m.id === currentModel?.id;
     
-    const pinColor = isCurrent ? 0xff3030 : 0xffa500; 
+    const pinColor = isCurrent ? 0x00cfcf : 0x005aff; 
     const pinMat = new THREE_G.MeshBasicMaterial({ color: pinColor });
     
     const head = new THREE_G.Mesh(new THREE_G.SphereGeometry(0.035, 10, 10), pinMat);
@@ -641,7 +657,7 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
 
   function tick() {
     if (!isDragging) { globe.rotation.y += vx; vx *= 0.98; }
-    renderer.render(scene, camera);
+    renderer.render(scene, camera);    
     requestAnimationFrame(tick);
   }
   tick();

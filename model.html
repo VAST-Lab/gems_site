@@ -43,6 +43,7 @@
 
   <main class="viewer-main">
     <div id="loader-wrap" class="loader-wrap">
+      <div id="compoundBadges" class="compound-badges" aria-label="Gem compounds"></div>
   <canvas id="c"></canvas>
   <div id="loader-overlay" class="loader-overlay">
     <div class="loader-pickaxe">⛏</div>
@@ -68,9 +69,11 @@
         <div><span class="k">Author</span><span id="author"></span></div>
         <div><span class="k">Gem Dimensions</span><span id="dimensions"></span></div>
         <div class="globe-row">
-          <canvas id="globe" class="globe-canvas"></canvas>
-          <div id="globe-location" class="globe-location"></div>
-        </div>
+	  <div class="globe-wrapper">
+	    <canvas id="globe" class="globe-canvas"></canvas>
+	  </div>
+	  <div id="globe-location" class="globe-location"></div>
+	</div>
         <div><span class="k">Date</span><span id="date"></span></div>
         <div><span class="k">Software</span><span id="software"></span></div>
         <div><span class="k">Polycount</span><span id="polycount"></span></div>
