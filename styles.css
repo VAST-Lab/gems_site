@@ -31,24 +31,27 @@ body {
   justify-content: space-between; 
   align-items: center; 
   gap: 14px;
-  padding: 30px 24px;
+  padding: 18px 24px;
   background: rgba(11, 12, 16, .86);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--border);
 }
 
+.topbar-left {
+  display: flex;
+  align-items: center;
+}
+
 .topbar-right {
   display: flex;
   align-items: center;
-  gap: 16px; /* Space between search and logo */
 }
 
 .header-logo {
-  height: 64px;
+  height: 84px;
   width: auto;
   display: block;
   object-fit: contain;
-  filter: brightness(1.1);
 }
 
 .brand { font-weight: 750; 
@@ -169,7 +172,29 @@ body {
   border-radius: 6px; background: rgba(0, 0, 0, 0.45); z-index: 2;
 }
 .card-badge span { display: block; border-radius: 1.5px; background: var(--thumb-badge-color); }
-.globe-canvas { width: 200px; height: 200px; border-radius: 50%; box-shadow: 0 4px 24px rgba(0,0,0,.5); }
+.globe-canvas { 
+  width: 200px; 
+  height: 200px;
+  border-radius: 50%;
+  border: 2px solid #525252;
+  box-sizing: border-box;
+  
+  box-shadow: 0 4px 24px rgba(0,0,0,.5);
+}
+.globe-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 16px 0;
+  padding: 12px 0;
+}
+.globe-location {
+  margin-top: 10px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+}
 
 /* --- LOADER --- */
 .loader-overlay {
@@ -218,4 +243,50 @@ body {
   border-color: #ffffff;
   background-color: rgba(255, 255, 255, 0.05);
   text-decoration: none !important;
+}
+#loader-wrap {
+position: relative;
+}
+
+.compound-badges {
+position: absolute;
+top: 76px;
+left: 18px;
+z-index: 6;
+display: none;
+flex-direction: column;
+gap: 8px;
+pointer-events: none;
+}
+
+.compound-badge {
+min-width: 34px;
+height: 30px;
+padding: 0 10px;
+border-radius: 8px;
+border: 1px solid var(--border2);
+background: rgba(70, 92, 145, 0.72);
+color: var(--text);
+font-size: 12px;
+font-weight: 700;
+display: inline-flex;
+align-items: center;
+justify-content: center;
+backdrop-filter: blur(6px);
+box-shadow: 0 4px 14px rgba(0,0,0,.22);
+}
+
+@media (max-width: 920px) {
+.compound-badges {
+top: 64px;
+left: 12px;
+gap: 6px;
+}
+
+.compound-badge {
+min-width: 30px;
+height: 28px;
+font-size: 11px;
+padding: 0 8px;
+}
 }
