@@ -265,6 +265,28 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
   setText("software", m.software);
   setText("polycount", (m.polycount ?? "").toString());
   addTagChips(m.tags);
+  renderCompoundBadges(m.compounds);
+  function renderCompoundBadges(compounds) {
+const host = document.getElementById("compoundBadges");
+if (!host) return;
+
+host.innerHTML = "";
+
+if (!Array.isArray(compounds) || compounds.length === 0) {
+host.style.display = "none";
+return;
+}
+
+host.style.display = "flex";
+
+for (const item of compounds) {
+const badge = document.createElement("div");
+badge.className = "compound-badge";
+badge.textContent = item.label ?? "";
+if (item.value) badge.title = `${item.label}: ${item.value}`;
+host.appendChild(badge);
+}
+}
 
   setLoaderProgress(35);
 

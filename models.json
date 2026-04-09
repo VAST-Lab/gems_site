@@ -4,7 +4,7 @@
     "name": "Purple Gem",
     "src": [
       "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/purple_gem.spz",
-	  "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/purple_gem.sog",
+      "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/purple_gem.sog",
       "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/Purple_Gem.ply"
     ],
     "thumb": "thumbs/purple_gem.jpg",
@@ -34,14 +34,20 @@
       "label": "Dallas, Texas"
     },
     "dimensions": "8 x 6 x 5 cm",
-    "badgeColor": "#ff8c00"
+    "badgeColor": "#ff8c00",
+    "compounds": [
+      { "label": "N", "value": "Nitrogen" },
+      { "label": "P", "value": "Phosphorus" },
+      { "label": "K", "value": "Potassium" },
+      { "label": "As", "value": "Arsenic" }
+    ]
   },
   {
     "id": "orange_gem_splat",
     "name": "Orange Gem",
     "src": [
       "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/orange_gem.spz",
-	  "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/orange_gem.sog",
+      "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/orange_gem.sog",
       "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/Orange_Gem.ply"
     ],
     "thumb": "thumbs/orange_gem.jpg",
@@ -68,9 +74,14 @@
     "location": {
       "lat": -15.7801,
       "lng": -47.9292,
-      "label": "Bras\u00edlia, Brazil"
+      "label": "Brasília, Brazil"
     },
-    "dimensions": "9 x 7 x 6 cm"
+    "dimensions": "9 x 7 x 6 cm",
+    "compounds": [
+      { "label": "Si", "value": "Silicon" },
+      { "label": "Fe", "value": "Iron" },
+      { "label": "Al", "value": "Aluminum" }
+    ]
   },
   {
     "id": "white_gem_splat",
@@ -78,7 +89,7 @@
     "src": [
       "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/white_gem.spz",
       "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/white_gem.sog",
-	  "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/White_Gem.ply"
+      "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/White_Gem.ply"
     ],
     "thumb": "thumbs/white_gem.jpg",
     "description": "",
@@ -106,6 +117,11 @@
       "lng": -92.2896,
       "label": "Little Rock, Arkansas"
     },
-    "dimensions": "11 x 8 x 7 cm"
+    "dimensions": "11 x 8 x 7 cm",
+    "compounds": [
+      { "label": "Ca", "value": "Calcium" },
+      { "label": "Mg", "value": "Magnesium" },
+      { "label": "Na", "value": "Sodium" }
+    ]
   }
 ]
