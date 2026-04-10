@@ -36,10 +36,9 @@
     "dimensions": "8 x 6 x 5 cm",
     "badgeColor": "#ff8c00",
     "compounds": [
-      { "label": "N", "value": "Nitrogen" },
-      { "label": "P", "value": "Phosphorus" },
-      { "label": "K", "value": "Potassium" },
-      { "label": "As", "value": "Arsenic" }
+      { "symbol": "N", "number": 7, "name": "Nitrogen", "color": "#36577d", "glow": "#4d78a8" },
+      { "symbol": "P", "number": 15, "name": "Phosphorus", "color": "#36577d", "glow": "#4d78a8" },
+      { "symbol": "As", "number": 33, "name": "Arsenic", "color": "#2f5f67", "glow": "#457f89" }
     ]
   },
   {
@@ -78,9 +77,9 @@
     },
     "dimensions": "9 x 7 x 6 cm",
     "compounds": [
-      { "label": "Si", "value": "Silicon" },
-      { "label": "Fe", "value": "Iron" },
-      { "label": "Al", "value": "Aluminum" }
+      { "symbol": "Si", "number": 14, "name": "Silicon", "color": "#2f5f67", "glow": "#457f89" },
+      { "symbol": "Fe", "number": 26, "name": "Iron", "color": "#6e6030", "glow": "#9a8740" },
+      { "symbol": "Al", "number": 13, "name": "Aluminum", "color": "#35584d", "glow": "#4a7769" }
     ]
   },
   {
@@ -119,9 +118,9 @@
     },
     "dimensions": "11 x 8 x 7 cm",
     "compounds": [
-      { "label": "Ca", "value": "Calcium" },
-      { "label": "Mg", "value": "Magnesium" },
-      { "label": "Na", "value": "Sodium" }
+      { "symbol": "Ca", "number": 20, "name": "Calcium", "color": "#75502f", "glow": "#9a6b3f" },
+      { "symbol": "Mg", "number": 12, "name": "Magnesium", "color": "#75502f", "glow": "#9a6b3f" },
+      { "symbol": "Na", "number": 11, "name": "Sodium", "color": "#6a3037", "glow": "#8e4952" }
     ]
   }
 ]
