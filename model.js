@@ -5,52 +5,47 @@ import { DRACOLoader } from "https://cdn.jsdelivr.net/npm/three@0.178/examples/j
 import { MeshoptDecoder } from "https://cdn.jsdelivr.net/npm/three@0.178/examples/jsm/libs/meshopt_decoder.module.js";
 import { SplatMesh } from "https://sparkjs.dev/releases/spark/0.1.10/spark.module.js";
 
-
 function getDeviceCapabilities() {
-	// detects if a device is low-end to enable swapping assets and resolution
-    const canvas = document.createElement('canvas');
-    const gl = canvas.getContext('webgl');
-    const debugInfo = gl?.getExtension('WEBGL_debug_renderer_info');
-    const renderer = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL).toLowerCase() : "";
-    
-    // check for mobile or integrated graphics
-    const isMobile = /iphone|ipad|android/i.test(navigator.userAgent);
-    const isLowPower = renderer.includes('intel') || renderer.includes('apple gpu') || renderer.includes('mali') || renderer.includes('adreno');
+  const canvas = document.createElement("canvas");
+  const gl = canvas.getContext("webgl");
+  const debugInfo = gl?.getExtension("WEBGL_debug_renderer_info");
+  const renderer = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL).toLowerCase() : "";
 
-    return {
-        isLowEnd: isMobile || isLowPower,
-        tier: (isMobile && !renderer.includes('apple')) ? 'low' : 'high'
-    };
+  const isMobile = /iphone|ipad|android/i.test(navigator.userAgent);
+  const isLowPower =
+    renderer.includes("intel") ||
+    renderer.includes("apple gpu") ||
+    renderer.includes("mali") ||
+    renderer.includes("adreno");
+
+  return {
+    isLowEnd: isMobile || isLowPower,
+    tier: isMobile && !renderer.includes("apple") ? "low" : "high"
+  };
 }
 
 async function getPersistentSplat(url, onProgress) {
-  // creates a persistent url to a splat saved local on disk
-	
-  const cacheName = 'gem-splat-cache';
+  const cacheName = "gem-splat-cache";
   const cache = await caches.open(cacheName);
-  
-  // check disk cache first
+
   const cachedResponse = await cache.match(url);
   if (cachedResponse) {
-    console.log("Loading from local disk cache");
     const blob = await cachedResponse.blob();
     return URL.createObjectURL(blob);
   }
 
-  // fetch from hugging face with redirect handling
-  const response = await fetch(url, { redirect: 'follow' });
+  const response = await fetch(url, { redirect: "follow" });
   if (!response.ok) throw new Error(`HuggingFace Error: ${response.status}`);
 
-  // track progress
-  const contentLength = response.headers.get('content-length');
+  const contentLength = response.headers.get("content-length");
   const total = parseInt(contentLength, 10);
   let loaded = 0;
 
   const reader = response.body.getReader();
   const chunks = [];
-  
-  while(true) {
-    const {done, value} = await reader.read();
+
+  while (true) {
+    const { done, value } = await reader.read();
     if (done) break;
     chunks.push(value);
     loaded += value.length;
@@ -58,12 +53,14 @@ async function getPersistentSplat(url, onProgress) {
   }
 
   const fullBlob = new Blob(chunks);
-  
-  // save to disk cache for next time
+
   try {
-    await cache.put(url, new Response(fullBlob, {
-	  headers: { 'Content-Length': fullBlob.size.toString() } // displays size in devtools
-	}));
+    await cache.put(
+      url,
+      new Response(fullBlob, {
+        headers: { "Content-Length": fullBlob.size.toString() }
+      })
+    );
   } catch (e) {
     console.warn("Storage full, loading anyway...");
   }
@@ -91,12 +88,48 @@ function addTagChips(tags) {
   const host = document.getElementById("tags");
   if (!host) return;
   host.innerHTML = "";
-  for (const t of (tags ?? [])) {
+  for (const t of tags ?? []) {
     const b = document.createElement("span");
     b.className = "chip";
     b.dataset.on = "false";
     b.textContent = t;
     host.appendChild(b);
+  }
+}
+
+function renderCompoundBadges(compounds) {
+  const host = document.getElementById("compoundBadges");
+  if (!host) return;
+
+  host.innerHTML = "";
+
+  if (!Array.isArray(compounds) || compounds.length === 0) {
+    host.style.display = "none";
+    return;
+  }
+
+  host.style.display = "flex";
+
+  for (const item of compounds) {
+    const badge = document.createElement("div");
+    badge.className = "compound-badge";
+
+    if (item.color) badge.style.setProperty("--compound-bg", item.color);
+    if (item.glow) badge.style.setProperty("--compound-glow", item.glow);
+
+    badge.title = item.name ? `${item.name} (${item.symbol ?? ""})` : item.symbol ?? "";
+
+    const num = document.createElement("div");
+    num.className = "compound-number";
+    num.textContent = item.number ?? "";
+
+    const sym = document.createElement("div");
+    sym.className = "compound-symbol";
+    sym.textContent = item.symbol ?? "";
+
+    badge.appendChild(num);
+    badge.appendChild(sym);
+    host.appendChild(badge);
   }
 }
 
@@ -170,7 +203,6 @@ function frameBox(camera, controls, box, offset = 1.4) {
   controls.update();
 }
 
-// Rotation from models.json + auto-fix splat
 function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) {
   const r = modelMeta?.rotation;
   if (r && typeof r === "object") {
@@ -180,7 +212,6 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
     return;
   }
 
-  // Auto orientation 
   if (defaultSplatFix) {
     obj3d.rotation.x = -Math.PI / 2;
   }
@@ -204,7 +235,7 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
   }
 
   const id = getId();
-  const m = (models ?? []).find(x => x.id === id) ?? (models ?? [])[0];
+  const m = (models ?? []).find((x) => x.id === id) ?? (models ?? [])[0];
 
   if (!m) {
     setText("title", "No models found");
@@ -218,24 +249,24 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
 
   setLoaderProgress(5);
 
-  // tries a higher performance filetype
   if (capabilities.isLowEnd) {
-	const preferredSrc = sources.find(url => url.endsWith('.spz') || url.endsWith('.sog'));
+    const lowEndPreferred = sources.find((url) => url.endsWith(".spz") || url.endsWith(".sog"));
+    if (lowEndPreferred) preferredSrc = lowEndPreferred;
   }
-  
-  const checkList = [preferredSrc, ...sources.filter(s => s !== preferredSrc)]; // prioritized list of sources
+
+  const checkList = [preferredSrc, ...sources.filter((s) => s !== preferredSrc)];
 
   setLoaderProgress(12);
   setText("status", "Locating best source...");
-  const cache = await caches.open('gem-splat-cache');
+  const cache = await caches.open("gem-splat-cache");
+
   for (const url of checkList) {
-	const isCached = await cache.match(url);
-	if (isCached) {
-	  finalSrc = url;
-	  //console.log("Found source in cache, skipping HEAD request");
-	  break;
-	}
-	  
+    const isCached = await cache.match(url);
+    if (isCached) {
+      finalSrc = url;
+      break;
+    }
+
     try {
       const res = await fetch(url, { method: "HEAD" });
       if (res.ok) {
@@ -247,15 +278,13 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
     }
   }
 
-  // Download button ply or glb
   const downloadBtn = document.getElementById("downloadBtn");
-  if (downloadBtn) {
+  if (downloadBtn && finalSrc) {
     downloadBtn.href = finalSrc;
-    downloadBtn.setAttribute("download", (finalSrc.split("/").pop() || "model"));
+    downloadBtn.setAttribute("download", finalSrc.split("/").pop() || "model");
   }
 
   setLoaderProgress(25);
-
   document.title = m.name ?? "Viewer";
   setText("title", m.name);
   setText("name", m.name);
@@ -266,38 +295,20 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
   setText("polycount", (m.polycount ?? "").toString());
   addTagChips(m.tags);
   renderCompoundBadges(m.compounds);
-  function renderCompoundBadges(compounds) {
-const host = document.getElementById("compoundBadges");
-if (!host) return;
-
-host.innerHTML = "";
-
-if (!Array.isArray(compounds) || compounds.length === 0) {
-host.style.display = "none";
-return;
-}
-
-host.style.display = "flex";
-
-for (const item of compounds) {
-const badge = document.createElement("div");
-badge.className = "compound-badge";
-badge.textContent = item.label ?? "";
-if (item.value) badge.title = `${item.label}: ${item.value}`;
-host.appendChild(badge);
-}
-}
 
   setLoaderProgress(35);
 
   const renderer = new THREE.WebGLRenderer({
     canvas,
-    antialias: !capabilities.isLowEnd, // disables aa if low-end device
+    antialias: !capabilities.isLowEnd,
     alpha: true,
-    powerPreference: "high-performance",
+    powerPreference: "high-performance"
   });
-  
-  const pixelRatio = capabilities.isLowEnd ? Math.min(window.devicePixelRatio, 1) : Math.min(window.devicePixelRatio, 2); // reduce resolution on low-end hardware
+
+  const pixelRatio = capabilities.isLowEnd
+    ? Math.min(window.devicePixelRatio, 1)
+    : Math.min(window.devicePixelRatio, 2);
+
   renderer.setPixelRatio(pixelRatio);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
@@ -309,8 +320,6 @@ host.appendChild(badge);
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
-
-  // Auto-spin, then idle
   controls.autoRotate = true;
   controls.autoRotateSpeed = 1.0;
 
@@ -337,8 +346,8 @@ host.appendChild(badge);
     { passive: true }
   );
 
-  // Lighting
   scene.add(new THREE.HemisphereLight(0xffffff, 0x222233, 0.95));
+
   const key = new THREE.DirectionalLight(0xffffff, 1.1);
   key.position.set(3, 5, 4);
   scene.add(key);
@@ -347,7 +356,6 @@ host.appendChild(badge);
   fill.position.set(-4, 2, -2);
   scene.add(fill);
 
-  // Ground 
   const groundMat = new THREE.MeshStandardMaterial({ color: 0x0f1117, roughness: 1 });
   const ground = new THREE.Mesh(new THREE.CircleGeometry(60, 96), groundMat);
   ground.rotation.x = -Math.PI / 2;
@@ -356,78 +364,63 @@ host.appendChild(badge);
 
   setLoaderProgress(45);
 
-  // GLTF loader setup
   const loader = new GLTFLoader();
   const draco = new DRACOLoader();
   draco.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/");
   loader.setDRACOLoader(draco);
   loader.setMeshoptDecoder(MeshoptDecoder);
 
-  // Load model
   if (isSplatFile(finalSrc)) {
     setLoaderProgress(50);
     setText("status", "Downloading Splat... 0%");
 
     try {
-	const localBlobUrl = await getPersistentSplat(finalSrc, (pct) => { 
-		setText("status", `Downloading... ${pct}%`); 
-		setLoaderProgress(50 + Math.round(pct * 0.35));
-	});
-	setLoaderProgress(88);
-	setText("status", "Processing Splat data...");
-	
-    const splat = new SplatMesh({
-    url: localBlobUrl,	
-    onLoad: (mesh) => {
+      const localBlobUrl = await getPersistentSplat(finalSrc, (pct) => {
+        setText("status", `Downloading... ${pct}%`);
+        setLoaderProgress(50 + Math.round(pct * 0.35));
+      });
 
-      // Apply rotation 
-      applyModelRotation(mesh, m, { defaultSplatFix: true });
-	  
-	  URL.revokeObjectURL(localBlobUrl); // free RAM immediately (could potentially cause crashes otherwise)
+      setLoaderProgress(88);
+      setText("status", "Processing Splat data...");
 
-      setText("status", "Loaded splat.");
-      hideLoaderOverlay();
+      const splat = new SplatMesh({
+        url: localBlobUrl,
+        onLoad: (mesh) => {
+          applyModelRotation(mesh, m, { defaultSplatFix: true });
 
-      try {
-        // 1  box AFTER rotation
-        const box1 = mesh.getBoundingBox(false);
-        const center = box1.getCenter(new THREE.Vector3());
+          URL.revokeObjectURL(localBlobUrl);
 
-        //  mesh center to world origin
-        mesh.position.sub(center);
+          setText("status", "Loaded splat.");
+          hideLoaderOverlay();
 
-		// offset 
-		if (m.offset) {
-		  mesh.position.x += m.offset.x ?? 0;
-		  mesh.position.y += m.offset.y ?? 0;
-		  mesh.position.z += m.offset.z ?? 0;
-		}
-        
+          try {
+            const box1 = mesh.getBoundingBox(false);
+            const center = box1.getCenter(new THREE.Vector3());
 
+            mesh.position.sub(center);
 
-        //  camera
-        const box2 = mesh.getBoundingBox(false);
-        if (box2 && box2.isBox3) {
-          frameBox(camera, controls, box2, 1.35);
+            if (m.offset) {
+              mesh.position.x += m.offset.x ?? 0;
+              mesh.position.y += m.offset.y ?? 0;
+              mesh.position.z += m.offset.z ?? 0;
+            }
+
+            const box2 = mesh.getBoundingBox(false);
+            if (box2 && box2.isBox3) {
+              frameBox(camera, controls, box2, 1.35);
+            }
+
+            controls.target.set(0, 0, 0);
+            controls.update();
+          } catch (e) {
+            camera.position.set(0, 0.25, 3);
+            controls.target.set(0, 0, 0);
+            controls.update();
+          }
         }
-
-        // orbit
-        controls.target.set(0, 0, 0);
-        controls.update();
-
-      } catch (e) {
-        // fallback if bounding box fails
-        camera.position.set(0, 0.25, 3);
-        controls.target.set(0, 0, 0);
-        controls.update();
-      }
-
-    },
-  });
+      });
 
       scene.add(splat);
-
-      
       await splat.initialized;
     } catch (err) {
       console.error(err);
@@ -440,15 +433,14 @@ host.appendChild(badge);
   } else {
     setLoaderProgress(55);
     setText("status", "Loading…");
+
     loader.load(
       finalSrc,
       (gltf) => {
         const root = gltf.scene ?? gltf.scenes?.[0];
         if (!root) throw new Error("No scene in GLTF");
 
-        
         applyModelRotation(root, m);
-
         scene.add(root);
 
         const box = fitCameraToObject(camera, controls, root, 1.25);
@@ -490,27 +482,32 @@ host.appendChild(badge);
     renderer.render(scene, camera);
     requestAnimationFrame(tick);
   }
+
   tick();
 })();
 
-// ── Globe ──────────────────────────────────────────────────────────────────
 (async () => {
   let allModels = [];
   try {
     const res = await fetch("models.json", { cache: "no-store" });
     allModels = await res.json();
-  } catch (e) { return; }
+  } catch (e) {
+    return;
+  }
 
   const currentId = new URL(location.href).searchParams.get("id");
-  const currentModel = allModels.find(x => x.id === currentId) ?? allModels[0];
+  const currentModel = allModels.find((x) => x.id === currentId) ?? allModels[0];
 
   const dimEl = document.getElementById("dimensions");
   if (dimEl) dimEl.textContent = currentModel?.dimensions ?? "—";
 
   const canvas = document.getElementById("globe");
   if (!canvas) return;
-  const hasAnyLocation = allModels.some(m => m.location);
-  if (!hasAnyLocation) { canvas.style.display = "none"; return; }
+  const hasAnyLocation = allModels.some((m) => m.location);
+  if (!hasAnyLocation) {
+    canvas.style.display = "none";
+    return;
+  }
 
   const THREE_G = await import("https://cdn.jsdelivr.net/npm/three@0.178/build/three.module.js");
 
@@ -528,18 +525,15 @@ host.appendChild(badge);
   camera.position.set(0, 0, 2.6);
 
   const textureLoader = new THREE_G.TextureLoader();
-  textureLoader.setCrossOrigin('anonymous'); 
+  textureLoader.setCrossOrigin("anonymous");
 
   const landTexture = textureLoader.load(
     "https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/textures/planets/earth_specular_2048.jpg"
   );
 
-  // note: adjust border color in `styles.css` in ".globe-canvas"
-  // this is done because the alphaMap's transparency causes render order problems
-
   const globe = new THREE_G.Mesh(
     new THREE_G.SphereGeometry(1, 64, 64),
-    new THREE_G.MeshBasicMaterial({ color: 0x525252 }) 
+    new THREE_G.MeshBasicMaterial({ color: 0x525252 })
   );
   globe.renderOrder = 1;
   scene.add(globe);
@@ -548,9 +542,9 @@ host.appendChild(badge);
     new THREE_G.SphereGeometry(1.002, 64, 64),
     new THREE_G.MeshBasicMaterial({
       alphaMap: landTexture,
-      color: 0x12141c, 
+      color: 0x12141c,
       transparent: true,
-      opacity: 1.0 
+      opacity: 1.0
     })
   );
   globe.renderOrder = 2;
@@ -561,26 +555,25 @@ host.appendChild(badge);
     const theta = (lng + 180) * (Math.PI / 180);
     return new THREE_G.Vector3(
       -r * Math.sin(phi) * Math.cos(theta),
-       r * Math.cos(phi),
-       r * Math.sin(phi) * Math.sin(theta)
+      r * Math.cos(phi),
+      r * Math.sin(phi) * Math.sin(theta)
     );
   }
 
   const pinMeshes = [];
 
-  allModels.forEach(m => {
+  allModels.forEach((m) => {
     if (!m.location) return;
     const pos = latLngToVec3(m.location.lat, m.location.lng);
     const isCurrent = m.id === currentModel?.id;
-    
-    const pinColor = isCurrent ? 0x00cfcf : 0x005aff; 
+
+    const pinColor = isCurrent ? 0x00cfcf : 0x005aff;
     const pinMat = new THREE_G.MeshBasicMaterial({ color: pinColor });
-    
+
     const head = new THREE_G.Mesh(new THREE_G.SphereGeometry(0.035, 10, 10), pinMat);
     head.position.copy(pos.clone().normalize().multiplyScalar(1.06));
     globe.add(head);
 
-    // Save metadata to the mesh for clicking
     pinMeshes.push({ mesh: head, modelId: m.id, label: m.location.label, name: m.name });
   });
 
@@ -597,16 +590,19 @@ host.appendChild(badge);
   const mouse = new THREE_G.Vector2();
 
   let isDragging = false;
-  let px = 0, py = 0;
-  let vx = 0.004, vy = 0;
+  let px = 0;
+  let py = 0;
+  let vx = 0.004;
+  let vy = 0;
 
-  canvas.addEventListener("pointerdown", e => {
+  canvas.addEventListener("pointerdown", (e) => {
     isDragging = true;
-    px = e.clientX; py = e.clientY;
+    px = e.clientX;
+    py = e.clientY;
     vx = vy = 0;
   });
 
-  window.addEventListener("pointermove", e => {
+  window.addEventListener("pointermove", (e) => {
     const rect = canvas.getBoundingClientRect();
     mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
@@ -614,19 +610,19 @@ host.appendChild(badge);
     if (isDragging) {
       const dx = e.clientX - px;
       const dy = e.clientY - py;
-      px = e.clientX; py = e.clientY;
+      px = e.clientX;
+      py = e.clientY;
       vx = dx * 0.008;
       vy = dy * 0.008;
       globe.rotation.y += vx;
       globe.rotation.x = Math.max(-1.2, Math.min(1.2, globe.rotation.x + vy));
     }
 
-    // Hover detection
     raycaster.setFromCamera(mouse, camera);
-    const hits = raycaster.intersectObjects(pinMeshes.map(p => p.mesh));
+    const hits = raycaster.intersectObjects(pinMeshes.map((p) => p.mesh));
 
     if (hits.length > 0) {
-      const entry = pinMeshes.find(p => p.mesh === hits[0].object);
+      const entry = pinMeshes.find((p) => p.mesh === hits[0].object);
       if (locLabel) locLabel.textContent = `${entry.name} — ${entry.label}`;
       canvas.style.cursor = "pointer";
     } else {
@@ -635,20 +631,20 @@ host.appendChild(badge);
     }
   });
 
-  window.addEventListener("pointerup", () => { isDragging = false; });
+  window.addEventListener("pointerup", () => {
+    isDragging = false;
+  });
 
-  // 🖱️ THE CLICK NAVIGATION LOGIC
-  canvas.addEventListener("click", e => {
+  canvas.addEventListener("click", (e) => {
     const rect = canvas.getBoundingClientRect();
     mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
     mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
 
     raycaster.setFromCamera(mouse, camera);
-    const hits = raycaster.intersectObjects(pinMeshes.map(p => p.mesh));
+    const hits = raycaster.intersectObjects(pinMeshes.map((p) => p.mesh));
 
     if (hits.length > 0) {
-      const entry = pinMeshes.find(p => p.mesh === hits[0].object);
-      // Only navigate if it's a different model
+      const entry = pinMeshes.find((p) => p.mesh === hits[0].object);
       if (entry.modelId !== currentId) {
         window.location.href = `model.html?id=${encodeURIComponent(entry.modelId)}`;
       }
@@ -656,9 +652,13 @@ host.appendChild(badge);
   });
 
   function tick() {
-    if (!isDragging) { globe.rotation.y += vx; vx *= 0.98; }
-    renderer.render(scene, camera);    
+    if (!isDragging) {
+      globe.rotation.y += vx;
+      vx *= 0.98;
+    }
+    renderer.render(scene, camera);
     requestAnimationFrame(tick);
   }
+
   tick();
 })();
