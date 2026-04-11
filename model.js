@@ -5,6 +5,18 @@ import { DRACOLoader } from "https://cdn.jsdelivr.net/npm/three@0.178/examples/j
 import { MeshoptDecoder } from "https://cdn.jsdelivr.net/npm/three@0.178/examples/jsm/libs/meshopt_decoder.module.js";
 import { SplatMesh } from "https://sparkjs.dev/releases/spark/0.1.10/spark.module.js";
 
+const SPLAT_CACHE_VERSION = "1.0.2";
+const SPLAT_CACHE_PREFIX = "gem-splat-cache-";
+const SPLAT_CACHE_NAME = `${SPLAT_CACHE_PREFIX}${SPLAT_CACHE_VERSION}`;
+
+async function clearOldSplatCaches() {
+  const names = await caches.keys();
+  const oldNames = names.filter(
+    (name) => name.startsWith(SPLAT_CACHE_PREFIX) && name !== SPLAT_CACHE_NAME
+  );
+  await Promise.all(oldNames.map((name) => caches.delete(name)));
+}
+
 function getDeviceCapabilities() {
   const canvas = document.createElement("canvas");
   const gl = canvas.getContext("webgl");
@@ -25,8 +37,7 @@ function getDeviceCapabilities() {
 }
 
 async function getPersistentSplat(url, onProgress) {
-  const cacheName = "gem-splat-cache";
-  const cache = await caches.open(cacheName);
+  const cache = await caches.open(SPLAT_CACHE_NAME);
 
   const cachedResponse = await cache.match(url);
   if (cachedResponse) {
@@ -221,6 +232,8 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
   const canvas = document.getElementById("c");
   if (!canvas) throw new Error("Canvas #c not found");
 
+  await clearOldSplatCaches();
+
   const capabilities = getDeviceCapabilities();
 
   let models;
@@ -258,7 +271,7 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
 
   setLoaderProgress(12);
   setText("status", "Locating best source...");
-  const cache = await caches.open("gem-splat-cache");
+  const cache = await caches.open(SPLAT_CACHE_NAME);
 
   for (const url of checkList) {
     const isCached = await cache.match(url);
