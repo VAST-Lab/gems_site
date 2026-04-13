@@ -292,9 +292,11 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
   }
 
   const downloadBtn = document.getElementById("downloadBtn");
-  if (downloadBtn && finalSrc) {
-    downloadBtn.href = finalSrc;
-    downloadBtn.setAttribute("download", finalSrc.split("/").pop() || "model");
+  if (downloadBtn) {
+    let plySrc = sources.find((url) => url.endsWith(".ply"));
+    if (!plySrc) return;
+    downloadBtn.href = plySrc;
+    downloadBtn.setAttribute("download", plySrc.split("/").pop() || "model");
   }
 
   setLoaderProgress(25);
