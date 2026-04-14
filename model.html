@@ -3,8 +3,6 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-
   <title>Model</title>
 
   <link rel="icon" type="image/x-icon" href="/assets/icons/favicon.ico">
@@ -27,16 +25,24 @@
         <a class="sb-item" href="convert.html">Convert</a>
         <a class="sb-item" href="index.html">Manage</a>
         <a class="sb-item" href="index.html">Upload</a>
+        <a class="sb-item" href="directions.html">Directions</a>
         <a class="sb-item" href="index.html">Settings</a>
       </nav>
       <div class="sb-footer muted">Tip: add models in<br><code>assets/models</code></div>
     </aside>
 
-    <div class="content">
-      <header class="viewer-topbar">
-        <a class="back" href="index.html">← Back</a>
-        <div class="viewer-title" id="title">Loading…</div>
-      </header>
+   
+        <div class="viewer-topbar">
+      <a class="back" href="index.html">← Back</a>
+      <div class="viewer-title" id="title">Orange Gem</div>
+
+      <img
+        src="GemScan.logo.PNG"
+        alt="GemScan"
+        class="viewer-topbar-logo"
+      >
+    </div>
+
 
       <main class="viewer-main">
         <div id="loader-wrap" class="loader-wrap">
@@ -92,6 +98,29 @@
           </div>
         </aside>
       </main>
+
+      <div id="ptableOverlay" class="ptable-overlay" hidden>
+  <div class="ptable-panel">
+    <div class="ptable-header">
+      <h2>Periodic Table of Elements</h2>
+      <button id="ptableClose" class="ptable-close" type="button" aria-label="Close periodic table">×</button>
+    </div>
+
+    <div id="ptableGrid" class="ptable-grid"></div>
+
+    <div class="ptable-legend">
+      <span><i style="background:#8f3b3b"></i>Alkali Metal</span>
+      <span><i style="background:#8a6335"></i>Alkaline Earth</span>
+      <span><i style="background:#8d7740"></i>Transition Metal</span>
+      <span><i style="background:#4d7f65"></i>Post-Transition</span>
+      <span><i style="background:#336b77"></i>Metalloid</span>
+      <span><i style="background:#45698f"></i>Nonmetal</span>
+      <span><i style="background:#5d4a8c"></i>Noble Gas</span>
+      <span><i style="background:#6d5a86"></i>Lanthanide</span>
+      <span><i style="background:#754d5f"></i>Actinide</span>
+    </div>
+  </div>
+</div>
 
       <script type="importmap">
       {
