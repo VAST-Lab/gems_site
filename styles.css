@@ -632,7 +632,7 @@ body {
 
 .viewer-topbar-logo {
   margin-left: auto;
-  height: 44px;
+  height: 64px;
   width: auto;
   display: block;
   object-fit: contain;
@@ -644,7 +644,7 @@ body {
   }
 
   .viewer-topbar-logo {
-    height: 24px;
+    height: 40px;
   }
 }
 
