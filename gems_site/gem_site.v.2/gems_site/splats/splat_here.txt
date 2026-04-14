@@ -1,3 +1,0 @@
-Put your 3D Gaussian Splat files here (.ply or .spz).
-Example entry in models.json:
-  "src": "assets/splats/Test01-Clean.ply"
