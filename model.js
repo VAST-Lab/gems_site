@@ -261,16 +261,25 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
 
   const sources = Array.isArray(m.src) ? m.src : [m.src];
   let finalSrc;
-  let preferredSrc = sources[0];
 
   setLoaderProgress(5);
 
-  if (capabilities.isLowEnd) {
-    const lowEndPreferred = sources.find((url) => url.endsWith(".spz") || url.endsWith(".sog"));
-    if (lowEndPreferred) preferredSrc = lowEndPreferred;
+  // .ply is always routed to the download button — never used for rendering
+  const plySrc = sources.find((s) => s.toLowerCase().endsWith(".ply"));
+  const downloadBtn = document.getElementById("downloadBtn");
+  if (downloadBtn && plySrc) {
+    downloadBtn.href = plySrc;
+    downloadBtn.setAttribute("download", plySrc.split("/").pop() || "model");
   }
 
-  const checkList = [preferredSrc, ...sources.filter((s) => s !== preferredSrc)];
+  // Render source priority: .sog > .spz > anything else (excluding .ply)
+  const renderSources = sources.filter((s) => !s.toLowerCase().endsWith(".ply"));
+  const sogSrc = renderSources.find((s) => s.toLowerCase().endsWith(".sog"));
+  const spzSrc = renderSources.find((s) => s.toLowerCase().endsWith(".spz"));
+  const preferredSrc = sogSrc ?? spzSrc ?? renderSources[0];
+  const checkList = preferredSrc
+    ? [preferredSrc, ...renderSources.filter((s) => s !== preferredSrc)]
+    : renderSources;
 
   setLoaderProgress(12);
   setText("status", "Locating best source...");
@@ -292,12 +301,6 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
     } catch (e) {
       console.warn(`Source not available, trying next: ${url}`);
     }
-  }
-
-  const downloadBtn = document.getElementById("downloadBtn");
-  if (downloadBtn && finalSrc) {
-    downloadBtn.href = finalSrc;
-    downloadBtn.setAttribute("download", finalSrc.split("/").pop() || "model");
   }
 
   setLoaderProgress(25);
