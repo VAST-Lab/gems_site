@@ -406,7 +406,7 @@ function isSplatFile(url) {
       return;
     }
     if (defaultSplatFix) {
-	  entity.setEulerAngles(180, 0, 0);    // pure 180 on X
+	  entity.setEulerAngles(-90, 0, 0);
     }
   }
 
