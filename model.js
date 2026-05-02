@@ -268,6 +268,8 @@ function isSplatFile(url) {
   const pc = await import(
     "https://cdn.jsdelivr.net/npm/playcanvas@2/build/playcanvas.mjs"
   );
+ // const pc = await import("https://cdn.jsdelivr.net/npm/playcanvas@2/build/playcanvas.mjs");
+  window.pc = pc;
 
   const pixelRatio = capabilities.isLowEnd
     ? Math.min(window.devicePixelRatio, 1)
@@ -301,8 +303,20 @@ function isSplatFile(url) {
   app.setCanvasFillMode(pc.FILLMODE_NONE);
   app.setCanvasResolution(pc.RESOLUTION_FIXED);
   app.graphicsDevice.maxPixelRatio = pixelRatio;
+  
+  // Wait one frame for CSS layout to settle, THEN start
+  requestAnimationFrame(() => {
+    syncCanvasSize();                        // re-read real dimensions
+    app.resizeCanvas(canvas.width, canvas.height);
+    app.start();
+  });
 
-  app.start();
+  window.addEventListener('resize', () => {
+    syncCanvasSize();
+    app.resizeCanvas(canvas.width, canvas.height);
+  });
+
+
 
   // ── Scene background colour ───────────────────────────────────────────────
   app.scene.ambientLight = new pc.Color(0.05, 0.06, 0.08);
@@ -311,12 +325,24 @@ function isSplatFile(url) {
   const cameraEntity = new pc.Entity("camera");
   cameraEntity.addComponent("camera", {
     clearColor: new pc.Color(0.043, 0.059, 0.078, 1),  // 0x0b0f14
-    nearClip:   0.01,
-    farClip:    2000,
-    fov:        50
+    nearClip:   0.001,
+    farClip:    1000//,
+    //fov:        50
   });
-  cameraEntity.setPosition(0, 0.6, 2.2);
+  //cameraEntity.setPosition(0, 0.6, 2.2);
+  cameraEntity.addComponent("script");
+
   app.root.addChild(cameraEntity);
+  
+  cameraEntity.script.create("orbitCamera", {
+	attributes: {
+	  inertiaFactor: 0.1,
+	  distanceMin: 0.1,
+	  distanceMax: 100
+	}
+  });
+  cameraEntity.script.create("orbitCameraInputMouse");
+  cameraEntity.script.create("orbitCameraInputTouch");
 
   // ── Lighting ──────────────────────────────────────────────────────────────
   // Hemisphere-style ambient is set above.  Add a key + fill directional.
@@ -373,14 +399,14 @@ function isSplatFile(url) {
    * Falls back to -90° X rotation for raw splat files when no metadata
    * rotation is specified (mirrors the original Three.js defaultSplatFix).
    */
-  function applyModelRotation(entity, modelMeta, { defaultSplatFix = false } = {}) {
+  function applyModelRotation(entity, modelMeta, { defaultSplatFix = true } = {}) {
     const r = modelMeta?.rotation;
     if (r && typeof r === "object") {
       entity.setEulerAngles(r.x ?? 0, r.y ?? 0, r.z ?? 0);
       return;
     }
     if (defaultSplatFix) {
-      entity.setEulerAngles(-90, 0, 0);
+	  entity.setEulerAngles(180, 0, 0);    // pure 180 on X
     }
   }
 
@@ -538,55 +564,58 @@ function isSplatFile(url) {
       app.assets.add(splatAsset);
 
       splatAsset.on("load", () => {
-        URL.revokeObjectURL(localBlobUrl);
+		const splatEntity = new pc.Entity("splat");
 
-        const splatEntity = new pc.Entity("splat");
-        applyModelRotation(splatEntity, m, { defaultSplatFix: true });
+		splatEntity.addComponent("gsplat", {
+			asset: splatAsset
+		});
 
-        splatEntity.addComponent("gsplat", {
-          asset: splatAsset
-        });
+		app.root.addChild(splatEntity);
 
-        app.root.addChild(splatEntity);
+		applyModelRotation(splatEntity, m, { defaultSplatFix: false });
+		if (m.offset) {
+			splatEntity.translate(m.offset.x ?? 0, m.offset.y ?? 0, m.offset.z ?? 0);
+		}
 
-        // Apply JSON offset
-        if (m.offset) {
-          splatEntity.translate(
-            m.offset.x ?? 0,
-            m.offset.y ?? 0,
-            m.offset.z ?? 0
-          );
-        }
+		let frameChecks = 0;
+		const tryFrame = () => {
+			// Access the instance via the component
+			const instance = splatEntity.gsplat.instance;
+			const aabb = instance?.meshInstance?.aabb;
 
-        // Frame camera using the component's AABB when available
-        // (gsplat component exposes .meshInstance.aabb after first render)
-        let framed      = false;
-        let frameChecks = 0;
-        const tryFrame  = () => {
-          try {
-            const gi   = splatEntity.gsplat?.meshInstance;
-            const aabb = gi?.aabb;
-            if (aabb && aabb.halfExtents.length() > 0) {
-              frameBoundingBox(aabb, 1.35);
-              orbit.syncFromCamera();
-              framed = true;
-            }
-          } catch (_) {}
+			if (aabb && aabb.halfExtents.length() > 0.001) {
+				console.log("Splat detected! Centering and Framing...");
 
-          if (!framed && frameChecks++ < 30) {
-            setTimeout(tryFrame, 100);
-          } else if (!framed) {
-            // Fallback: just pull back a bit
-            cameraEntity.setPosition(0, 0.25, 3);
-            orbit.target.set(0, 0, 0);
-            orbit.syncFromCamera();
-          }
-        };
+				const worldPos = splatEntity.getPosition();
+				const center = aabb.center;
+				    splatEntity.setPosition(
+					worldPos.x - center.x,
+					worldPos.y - center.y,
+					worldPos.z - center.z
+				);
 
-        setText("status", "Loaded splat.");
-        hideLoaderOverlay();
-        tryFrame();
-      });
+				const centeredAABB = new pc.BoundingBox(new pc.Vec3(0, 0, 0), aabb.halfExtents.clone());
+				frameBoundingBox(centeredAABB, 1.35);
+				orbit.target.set(0, 0, 0);   // explicitly reset orbit target to origin
+				orbit.syncFromCamera();
+
+				setText("status", "Loaded and Centered.");
+				hideLoaderOverlay();
+			} else {
+				if (frameChecks++ < 50) {
+					setTimeout(tryFrame, 100);
+				} else {
+					console.warn("Framing failed, using fallback camera.");
+					cameraEntity.setPosition(0, 0.5, 3);
+					orbit.target.set(0, 0, 0);
+					orbit.syncFromCamera();
+					hideLoaderOverlay();
+				}
+			}
+		};
+
+		tryFrame();
+	});
 
       splatAsset.on("error", (err) => {
         console.error(err);
@@ -595,6 +624,7 @@ function isSplatFile(url) {
         setText("title",  "Failed to load splat");
         setText("name",   "Failed to load splat");
         setText("desc",   String(err));
+		//console.error("PlayCanvas Load Error Details:", err);
       });
 
       app.assets.load(splatAsset);
