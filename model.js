@@ -742,8 +742,20 @@ function isSplatFile(url) {
   renderer.outputColorSpace = THREE_G.SRGBColorSpace;
 
   const scene  = new THREE_G.Scene();
-  const camera = new THREE_G.PerspectiveCamera(45, 1, 0.1, 100);
-  camera.position.set(0, 0, 2.6);
+ const camera = new THREE_G.PerspectiveCamera(45, 1, 0.1, 100);
+let globeZoom = 2.6;
+const MIN_GLOBE_ZOOM = 1.6;
+const MAX_GLOBE_ZOOM = 4.2;
+camera.position.set(0, 0, globeZoom);
+
+canvas.addEventListener("wheel", (e) => {
+  e.preventDefault();
+
+  globeZoom += e.deltaY * 0.003;
+  globeZoom = Math.max(MIN_GLOBE_ZOOM, Math.min(MAX_GLOBE_ZOOM, globeZoom));
+
+  camera.position.z = globeZoom;
+}, { passive: false });
 
   const textureLoader = new THREE_G.TextureLoader();
   textureLoader.setCrossOrigin("anonymous");
