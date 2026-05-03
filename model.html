@@ -23,14 +23,14 @@
     <aside class="sidebar">
       <div class="sb-brand">GemScans Library</div>
       <nav class="sb-nav">
+    
         <a class="sb-item sb-item-on" href="index.html">Explore</a>
-        <a class="sb-item" href="convert.html">Convert</a>
-        <a class="sb-item" href="index.html">Manage</a>
-        <a class="sb-item" href="index.html">Upload</a>
+       <a class="sb-item" href="index.html">My Library</a>
         <a class="sb-item" href="directions.html">Directions</a>
         <a class="sb-item" href="index.html">Settings</a>
+         <a class="sb-item" href="index.html">About</a>
       </nav>
-      <div class="sb-footer muted">Tip: add models in<br><code>assets/models</code></div>
+      <div class="sb-footer muted">Drag to rotate • scroll to zoom • right-drag to pan</code></div>
     </aside>
 
    
@@ -62,33 +62,53 @@
           </div>
         </div>
 
-        <aside class="panel">
-          <h2 id="name">Loading…</h2>
+      <aside class="panel">
+  <h2 id="name">Loading…</h2>
 
-          <div class="desc-box">
-            <div class="desc-label">Description</div>
-            <p id="desc" class="desc-body">Description goes here</p>
-          </div>
+<div class="filters-row" style="margin-top:14px">
+    <div class="filters-title">Tags</div>
+    <div id="tags" class="chips"></div>
+  </div>
 
-          <p class="muted" id="status"></p>
+    <div class="meta">
+    <div><span class="k">Author</span><span id="author"></span></div>
+    <div><span class="k">Gem Dimensions</span><span id="dimensions"></span></div>
+  </div>
 
-          <a id="downloadBtn" class="btn" href="#" download>Download PLY</a>
+  <div class="globe-row">
+    <div class="globe-wrapper">
+      <canvas id="globe" class="globe-canvas"></canvas>
+    </div>
+    <div id="globe-location" class="globe-location"></div>
+  </div>
 
-          <div class="meta">
-            <div><span class="k">Author</span><span id="author"></span></div>
-            <div><span class="k">Gem Dimensions</span><span id="dimensions"></span></div>
+      <p class="muted" id="status"></p>
 
-            <div class="globe-row">
-              <div class="globe-wrapper">
-                <canvas id="globe" class="globe-canvas"></canvas>
-              </div>
-              <div id="globe-location" class="globe-location"></div>
-            </div>
+  <div class="globe-help">
+  Drag to rotate • Scroll to zoom • Click pin to go to a new gem
+</div>
 
-            <div><span class="k">Date</span><span id="date"></span></div>
-            <div><span class="k">Software</span><span id="software"></span></div>
-            <div><span class="k">Polycount</span><span id="polycount"></span></div>
-          </div>
+
+   <div class="meta">
+    <div><span class="k">Date</span><span id="date"></span></div>
+    <div><span class="k">Software</span><span id="software"></span></div>
+    <div><span class="k">Polycount</span><span id="polycount"></span></div>
+  </div>
+  
+   
+  <div class="desc-box">
+    <div class="desc-label">Description</div>
+    <p id="desc" class="desc-body">Description goes here.</p>
+  </div>
+
+  <a id="downloadBtn" class="btn" href="#" download>Download PLY</a>
+
+
+
+ 
+
+
+</aside>
 
           <div class="filters-row" style="margin-top:14px;">
             <div class="filters-title">Tags</div>
@@ -96,7 +116,7 @@
           </div>
 
           <div class="small" style="margin-top:14px;">
-            Drag to rotate • scroll to zoom • right-drag to pan
+            Drag to rotate • Scroll to zoom • Click pin to go to a new gem •
           </div>
         </aside>
       </main>
@@ -123,14 +143,6 @@
     </div>
   </div>
 </div>
-
-      <script type="importmap">
-      {
-        "imports": {
-          "three": "https://cdn.jsdelivr.net/npm/three@0.178/build/three.module.js"
-        }
-      }
-      </script>
 
       <script type="module" src="model.js"></script>
     </div>

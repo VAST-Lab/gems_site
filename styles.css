@@ -270,10 +270,11 @@ body {
 }
 
 .viewer-main {
-  height: 100%;
+  height: 100vh;
   padding-top: 54px;
   display: grid;
   grid-template-columns: 1fr 340px;
+  box-sizing: border-box;
 }
 
 .loader-wrap {
@@ -403,7 +404,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 16px 0;
+  margin: 56px 0 16px;
   padding: 12px 0;
 }
 
@@ -411,6 +412,13 @@ body {
   margin-top: 10px;
   text-align: center;
   color: var(--muted);
+  font-size: 13px;
+}
+
+.globe-help {
+  margin-top: 14px;
+  text-align: center;
+  color: var(--text);
   font-size: 13px;
 }
 
@@ -595,8 +603,9 @@ body {
 }
 
 #downloadBtn {
-  display: inline-block;
-  margin-top: 14px;
+  display: block;
+  width: fit-content;
+  margin: 14px auto 0;
   padding: 8px 16px;
   background-color: transparent;
   color: #ffffff !important;
@@ -658,23 +667,27 @@ body {
 
 .ptable-overlay {
   position: fixed;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 220px;
   z-index: 50;
   background: rgba(5, 8, 14, 0.58);
   backdrop-filter: blur(6px);
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
 .ptable-panel {
-  width: min(660px, 100vw - 24px);
+  width: min(660px, calc(100vw - 220px - 24px));
   height: 100vh;
   background:
     radial-gradient(circle at 70% 20%, rgba(35, 52, 96, 0.14), transparent 28%),
     radial-gradient(circle at 75% 75%, rgba(35, 52, 96, 0.10), transparent 26%),
     linear-gradient(180deg, rgba(18, 20, 28, 0.98), rgba(11, 12, 16, 0.98));
-  border-left: 1px solid var(--border);
-  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.35);
+  border-right: 1px solid var(--border);
+  border-left: none;
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.35);
   overflow: auto;
 }
 
@@ -772,6 +785,10 @@ body {
 }
 
 @media (max-width: 920px) {
+  .ptable-overlay {
+    left: 0;
+  }
+
   .ptable-panel {
     width: 100vw;
   }

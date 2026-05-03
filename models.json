@@ -12,7 +12,7 @@
     "author": "You",
     "rotation": {
       "x": 90,
-      "y": 90,
+      "y": -90,
       "z": 90
     },
     "offset": {
@@ -54,7 +54,7 @@
     "author": "You",
     "rotation": {
       "x": -90,
-      "y": -90,
+      "y": 90,
       "z": 90
     },
     "offset": {
@@ -95,7 +95,7 @@
     "author": "You",
     "rotation": {
       "x": 90,
-      "y": 90,
+      "y": -90,
       "z": 90
     },
     "offset": {
