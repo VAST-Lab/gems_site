@@ -9,7 +9,7 @@
     ],
     "thumb": "thumbs/purple_gem.jpg",
     "description": "",
-    "author": "You",
+    "author": "VAST Lab",
     "rotation": {
       "x": 90,
       "y": -90,
@@ -51,7 +51,7 @@
     ],
     "thumb": "thumbs/orange_gem.jpg",
     "description": "",
-    "author": "You",
+    "author": "VAST Lab",
     "rotation": {
       "x": -90,
       "y": 90,
@@ -92,7 +92,7 @@
     ],
     "thumb": "thumbs/white_gem.jpg",
     "description": "",
-    "author": "You",
+    "author": "VAST Lab",
     "rotation": {
       "x": 90,
       "y": -90,
@@ -121,6 +121,48 @@
       { "symbol": "Ca", "number": 20, "name": "Calcium", "color": "#75502f", "glow": "#9a6b3f" },
       { "symbol": "Mg", "number": 12, "name": "Magnesium", "color": "#75502f", "glow": "#9a6b3f" },
       { "symbol": "Na", "number": 11, "name": "Sodium", "color": "#6a3037", "glow": "#8e4952" }
+    ]
+  },
+  {
+    "id": "meatball_geode",
+    "name": "Meatball Geode",
+    "src": [
+      "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/meatball_geode.spz",
+      "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/meatball_geode.sog",
+      "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/meatball_geode.ply"
+    ],
+    "thumb": "thumbs/meatball_geode.jpg",
+    "description": "",
+    "author": "VAST Lab",
+    "rotation": {
+      "x": 180,
+      "y": 0,
+      "z": 0
+    },
+    "offset": {
+      "x": -3,
+      "y": -38,
+      "z": 0
+    },
+    "date": "2026-05-13",
+    "tags": [
+      "splat",
+      "ply",
+      "scan"
+    ],
+    "polycount": 883987,
+    "software": "Gaussian Splatting",
+    "location": {
+      "lat": -48.8767,
+      "lng": -123.3933,
+      "label": "Unknown For Now (PLACEHOLDER)"
+    },
+    "dimensions": "A x B x C cm (PLACEHOLDER)",
+    "badgeColor": "#ff8c00",
+    "compounds": [
+      { "symbol": "N", "number": 7, "name": "Nitrogen", "color": "#36577d", "glow": "#4d78a8" },
+      { "symbol": "P", "number": 15, "name": "Phosphorus", "color": "#36577d", "glow": "#4d78a8" },
+      { "symbol": "As", "number": 33, "name": "Arsenic", "color": "#2f5f67", "glow": "#457f89" }
     ]
   }
 ]
