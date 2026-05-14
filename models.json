@@ -125,7 +125,7 @@
   },
   {
     "id": "meatball_geode",
-    "name": "Meatball Geode",
+    "name": "Quartz Geode",
     "src": [
       "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/meatball_geode.spz",
       "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/meatball_geode.sog",
@@ -153,11 +153,11 @@
     "polycount": 883987,
     "software": "Gaussian Splatting",
     "location": {
-      "lat": -48.8767,
-      "lng": -123.3933,
-      "label": "Unknown For Now (PLACEHOLDER)"
+      "lat": 28.632996,
+      "lng": -106.0691,
+      "label": "Chihuahua, Mexico"
     },
-    "dimensions": "A x B x C cm (PLACEHOLDER)",
+    "dimensions": "6.731 x 3.81 cm",
     "badgeColor": "#ff8c00",
     "compounds": [
       { "symbol": "N", "number": 7, "name": "Nitrogen", "color": "#36577d", "glow": "#4d78a8" },
