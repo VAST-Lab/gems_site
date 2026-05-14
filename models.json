@@ -160,9 +160,8 @@
     "dimensions": "6.731 x 3.81 cm",
     "badgeColor": "#ff8c00",
     "compounds": [
-      { "symbol": "N", "number": 7, "name": "Nitrogen", "color": "#36577d", "glow": "#4d78a8" },
-      { "symbol": "P", "number": 15, "name": "Phosphorus", "color": "#36577d", "glow": "#4d78a8" },
-      { "symbol": "As", "number": 33, "name": "Arsenic", "color": "#2f5f67", "glow": "#457f89" }
+      { "symbol": "Si", "number": 14, "name": "Silicon", "color": "#336b77", "glow": "#4d78a8" },
+      { "symbol": "O", "number": 8, "name": "Oxygen", "color": "#45698f", "glow": "#457f89" }
     ]
   }
 ]
