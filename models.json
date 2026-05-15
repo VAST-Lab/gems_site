@@ -168,7 +168,6 @@
     "id": "iron_stone_with_quartz",
     "name": "Iron Stone with Quartz Crystal",
     "src": [
-	  "splats/iron_quartz.sog",
       "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/iron_quartz.spz",
       "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/iron_quartz.sog",
       "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/iron_quartz.ply"
