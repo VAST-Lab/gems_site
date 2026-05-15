@@ -163,5 +163,48 @@
       { "symbol": "Si", "number": 14, "name": "Silicon", "color": "#336b77", "glow": "#4d78a8" },
       { "symbol": "O", "number": 8, "name": "Oxygen", "color": "#45698f", "glow": "#457f89" }
     ]
+  },
+  {
+    "id": "iron_stone_with_quartz",
+    "name": "Iron Stone with Quartz Crystal",
+    "src": [
+	  "splats/iron_quartz.sog",
+      "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/iron_quartz.spz",
+      "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/iron_quartz.sog",
+      "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/iron_quartz.ply"
+    ],
+    "thumb": "thumbs/iron_quartz.jpg",
+    "description": "",
+    "author": "VAST Lab",
+    "rotation": {
+      "x": 180,
+      "y": 0,
+      "z": 0
+    },
+    "offset": {
+      "x": -3,
+      "y": -38,
+      "z": 0
+    },
+    "date": "2026-05-14",
+    "tags": [
+      "splat",
+      "ply",
+      "scan"
+    ],
+    "polycount": 973196,
+    "software": "Gaussian Splatting",
+    "location": {
+      "lat": 32.3895,
+      "lng": -106.000629,
+      "label": "Chihuahuan Desert"
+    },
+    "dimensions": "10.414 x 5.842 x 3.175 cm",
+    "badgeColor": "#ff8c00",
+    "compounds": [
+      { "symbol": "Si", "number": 14, "name": "Silicon", "color": "#336b77", "glow": "#4d78a8" },
+      { "symbol": "O", "number": 8, "name": "Oxygen", "color": "#45698f", "glow": "#457f89" },
+	  { "symbol": "Fe", "number": 26, "name": "Iron", "color": "#8d7740", "glow": "#457f89" }
+    ]
   }
 ]
