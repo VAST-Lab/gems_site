@@ -1,9 +1,3 @@
-// ─── PlayCanvas CDN ────────────────────────────────────────────────────────
-// The main gem viewer uses PlayCanvas Engine (v2).
-// The globe, periodic-table, and all UI helpers are unchanged and still use
-// Three.js (imported lazily inside their own IIFE exactly as before).
-// ───────────────────────────────────────────────────────────────────────────
-
 const SPLAT_CACHE_VERSION = "1.0.2";
 const SPLAT_CACHE_PREFIX  = "gem-splat-cache-";
 const SPLAT_CACHE_NAME    = `${SPLAT_CACHE_PREFIX}${SPLAT_CACHE_VERSION}`;
@@ -410,7 +404,7 @@ function isSplatFile(url) {
     }
   }
 
-  // ── Orbit-camera controller (replaces OrbitControls) ─────────────────────
+  // ── Orbit-camera controller ─────────────────────
   const orbit = {
     target:      new pc.Vec3(0, 0, 0),
     spherical:   { r: 2.2, theta: 0, phi: Math.PI / 2 },
@@ -706,7 +700,7 @@ function isSplatFile(url) {
 })();
 
 
-// ─── GLOBE  (Three.js — completely unchanged) ─────────────────────────────
+// ─── GLOBE ─────────────────────────────
 (async () => {
   let allModels = [];
   try {
@@ -743,9 +737,10 @@ function isSplatFile(url) {
 
   const scene  = new THREE_G.Scene();
  const camera = new THREE_G.PerspectiveCamera(45, 1, 0.1, 100);
+const DEFAULT_GLOBE_ZOOM = 2.6;
 let globeZoom = 2.6;
 const MIN_GLOBE_ZOOM = 1.6;
-const MAX_GLOBE_ZOOM = 4.2;
+const MAX_GLOBE_ZOOM = DEFAULT_GLOBE_ZOOM;
 camera.position.set(0, 0, globeZoom);
 
 canvas.addEventListener("wheel", (e) => {
@@ -889,6 +884,13 @@ canvas.addEventListener("wheel", (e) => {
       globe.rotation.y += vx;
       vx *= 0.98;
     }
+
+    // Scale pins inversely with zoom so they stay visually consistent
+    const pinScale = globeZoom / DEFAULT_GLOBE_ZOOM;
+    for (const { mesh } of pinMeshes) {
+      mesh.scale.setScalar(pinScale);
+    }
+
     renderer.render(scene, camera);
     requestAnimationFrame(tick);
   }
@@ -897,7 +899,7 @@ canvas.addEventListener("wheel", (e) => {
 })();
 
 
-// ─── PERIODIC TABLE  (unchanged) ──────────────────────────────────────────
+// ─── PERIODIC TABLE  ──────────────────────────────────────────
 const PERIODIC_TABLE = [
   { number: 1,  symbol: "H",  category: "nonmetal",   row: 1, col: 1  },
   { number: 2,  symbol: "He", category: "noble",      row: 1, col: 18 },
