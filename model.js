@@ -272,8 +272,10 @@ function isSplatFile(url) {
   // Size canvas to its CSS box before creating the app so the initial
   // viewport is correct.
   function syncCanvasSize() {
+    // Clear inline size so the CSS layout can freely shrink/grow the canvas
+    canvas.style.width  = "";
+    canvas.style.height = "";
     const rect = canvas.getBoundingClientRect();
-    console.log("Canvas Size Detected:", rect.width, rect.height);
     const w    = Math.max(1, Math.floor(rect.width));
     const h    = Math.max(1, Math.floor(rect.height));
     canvas.width  = w * pixelRatio;
@@ -306,8 +308,7 @@ function isSplatFile(url) {
   });
 
   window.addEventListener('resize', () => {
-    syncCanvasSize();
-    app.resizeCanvas(canvas.width, canvas.height);
+    resize();
   });
 
 
@@ -367,12 +368,22 @@ function isSplatFile(url) {
   function frameBoundingBox(aabb, offsetMul = 1.35) {
     if (!aabb) return;
 
-    const size    = aabb.halfExtents.length() * 2;          // longest diagonal
     const maxDim  = Math.max(
       aabb.halfExtents.x, aabb.halfExtents.y, aabb.halfExtents.z
     ) * 2;
-    const fovRad  = (cameraEntity.camera.fov * Math.PI) / 180;
-    let   dist    = Math.abs((maxDim / 2) / Math.tan(fovRad / 2)) * offsetMul;
+
+    // Vertical FOV in radians
+    const vFovRad = (cameraEntity.camera.fov * Math.PI) / 180;
+
+    // Derive horizontal FOV from actual canvas aspect ratio
+    const rect    = canvas.getBoundingClientRect();
+    const aspect  = rect.width / Math.max(1, rect.height);
+    const hFovRad = 2 * Math.atan(Math.tan(vFovRad / 2) * aspect);
+
+    // Use the more constraining axis so the gem always fits
+    const distV   = Math.abs((maxDim / 2) / Math.tan(vFovRad / 2));
+    const distH   = Math.abs((maxDim / 2) / Math.tan(hFovRad / 2));
+    const dist    = Math.max(distV, distH) * offsetMul;
 
     const center  = aabb.center;
     cameraEntity.setPosition(
@@ -381,6 +392,7 @@ function isSplatFile(url) {
       center.z + dist
     );
 
+    cameraEntity.camera.aspectRatio = aspect;
     cameraEntity.camera.nearClip = Math.max(0.01, maxDim / 200);
     cameraEntity.camera.farClip  = Math.max(50,   maxDim * 50);
 
@@ -509,22 +521,33 @@ function isSplatFile(url) {
 
   // ── Resize handler ────────────────────────────────────────────────────────
   function resize() {
+    // Clear inline size so the CSS layout can shrink the canvas freely,
+    // then re-measure and lock it back to pixel-perfect dimensions.
+    canvas.style.width  = "";
+    canvas.style.height = "";
     const rect = canvas.getBoundingClientRect();
     const w    = Math.max(1, Math.floor(rect.width));
     const h    = Math.max(1, Math.floor(rect.height));
     const pw   = Math.round(w * pixelRatio);
     const ph   = Math.round(h * pixelRatio);
     if (canvas.width !== pw || canvas.height !== ph) {
+      canvas.width  = pw;
+      canvas.height = ph;
       app.resizeCanvas(pw, ph);
-      canvas.style.width  = `${w}px`;
-      canvas.style.height = `${h}px`;
-      cameraEntity.camera.aspectRatio = w / h;
     }
+    canvas.style.width  = `${w}px`;
+    canvas.style.height = `${h}px`;
+    // Always keep aspect ratio in sync so the gem stays centred
+    cameraEntity.camera.aspectRatio = w / h;
   }
 
-  // Hook into PlayCanvas update loop
+  // Use ResizeObserver on the canvas's parent so we catch layout changes
+  // (window resize, sidebar toggle, panel open/close, etc.) reliably.
+  const _resizeObserver = new ResizeObserver(() => resize());
+  _resizeObserver.observe(canvas.parentElement ?? canvas);
+
+  // Hook into PlayCanvas update loop (orbit only; resize handled above)
   app.on("update", (dt) => {
-    resize();
     orbit.tick(dt);
   });
 
@@ -582,28 +605,40 @@ function isSplatFile(url) {
 
 				const worldPos = splatEntity.getPosition();
 				const center = aabb.center;
-				    splatEntity.setPosition(
+				splatEntity.setPosition(
 					worldPos.x - center.x,
 					worldPos.y - center.y,
 					worldPos.z - center.z
 				);
 
 				const centeredAABB = new pc.BoundingBox(new pc.Vec3(0, 0, 0), aabb.halfExtents.clone());
-				frameBoundingBox(centeredAABB, 1.35);
-				orbit.target.set(0, 0, 0);   // explicitly reset orbit target to origin
-				orbit.syncFromCamera();
 
+				// Hide the loader first so the canvas has its real layout dimensions,
+				// then re-frame on the next animation frame when getBoundingClientRect is accurate.
 				setText("status", "Loaded and Centered.");
 				hideLoaderOverlay();
+
+				requestAnimationFrame(() => {
+					syncCanvasSize();
+					app.resizeCanvas(canvas.width, canvas.height);
+					frameBoundingBox(centeredAABB, 1.35);
+					orbit.target.set(0, 0, 0);
+					orbit.syncFromCamera();
+				});
 			} else {
 				if (frameChecks++ < 50) {
 					setTimeout(tryFrame, 100);
 				} else {
 					console.warn("Framing failed, using fallback camera.");
-					cameraEntity.setPosition(0, 0.5, 3);
-					orbit.target.set(0, 0, 0);
-					orbit.syncFromCamera();
 					hideLoaderOverlay();
+					requestAnimationFrame(() => {
+						syncCanvasSize();
+						app.resizeCanvas(canvas.width, canvas.height);
+						cameraEntity.setPosition(0, 0.5, 3);
+						cameraEntity.camera.aspectRatio = canvas.width / Math.max(1, canvas.height);
+						orbit.target.set(0, 0, 0);
+						orbit.syncFromCamera();
+					});
 				}
 			}
 		};
@@ -670,13 +705,14 @@ function isSplatFile(url) {
       }
 
       if (aabb) {
-        frameBoundingBox(aabb, 1.25);
-        orbit.syncFromCamera();
+        hideLoaderOverlay();
+        requestAnimationFrame(() => {
+          syncCanvasSize();
+          app.resizeCanvas(canvas.width, canvas.height);
+          frameBoundingBox(aabb, 1.25);
+          orbit.syncFromCamera();
+        });
       }
-
-      setLoaderProgress(100);
-      setText("status", "Loaded model.");
-      hideLoaderOverlay();
     });
 
     gltfAsset.on("progress", (loaded, total) => {
