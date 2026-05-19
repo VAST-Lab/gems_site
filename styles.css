@@ -755,6 +755,11 @@ body {
   transform: scale(1.03);
 }
 
+.ptable-cell.dimmed {
+  opacity: 0.4;
+  filter: saturate(20%);
+}
+
 .ptable-num {
   font-size: 8px;
   color: rgba(255,255,255,.72);

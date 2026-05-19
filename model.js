@@ -1026,7 +1026,12 @@ function openPeriodicTable(activeSymbol) {
       }
 
       div.className = "ptable-cell";
-      if (cell.symbol === activeSymbol) div.classList.add("active");
+      if (cell.symbol === activeSymbol) {
+		div.classList.add("active");
+	  }
+	  else if (activeSymbol) {
+	    div.classList.add("dimmed");
+	  }
       div.style.background = CATEGORY_COLORS[cell.category] ?? "#3f4d63";
       div.innerHTML = `
         <div class="ptable-num">${cell.number}</div>
