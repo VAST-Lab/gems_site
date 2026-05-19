@@ -756,8 +756,8 @@ body {
 }
 
 .ptable-cell.dimmed {
-  opacity: 0.4;
-  filter: saturate(20%);
+  opacity: 0.5;
+  filter: saturate(40%);
 }
 
 .ptable-num {
