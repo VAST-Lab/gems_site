@@ -223,6 +223,12 @@ body {
   color: var(--muted);
   font-size: 13px;
   line-height: 1.35;
+  
+  /* Truncate the Description */
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .card-tags {
