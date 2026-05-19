@@ -88,6 +88,9 @@ function renderChips() {
 }
 
 function cardHTML(m) {
+  const hasSrc = m.src && (Array.isArray(m.src) ? m.src.length > 0 : m.src.trim() !== "");
+  
+  
   const href = `model.html?id=${encodeURIComponent(m.id)}`;
   const tags = (m.tags ?? []).slice(0, 3).map(t => `<span class="badge">${t}</span>`).join("");
 
@@ -116,6 +119,20 @@ const thumbMarkup = thumb
          </div>`
       : `<div class="thumb thumb-placeholder">${badge}<div class="ph">SPLAT</div></div>`
     );
+	
+  if (!hasSrc) { // if no src add Unavailable to title and disable link
+    return `
+      <div class="card disabled-card">
+        ${thumbMarkup}
+        <div class="card-meta">
+          <div class="card-title">${m.name} (Currently Unavailable)</div>
+          <div class="card-sub">${m.description ?? ""}</div>
+          <div class="card-tags">${tags}</div>
+        </div>
+      </div>
+    `;
+  }
+  
   return `
     <a class="card" href="${href}">
       ${thumbMarkup}
