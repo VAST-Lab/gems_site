@@ -1,4 +1,4 @@
-const SPLAT_CACHE_VERSION = "1.0.3";
+const SPLAT_CACHE_VERSION = "1.0.2";
 const SPLAT_CACHE_PREFIX  = "gem-splat-cache-";
 const SPLAT_CACHE_NAME    = `${SPLAT_CACHE_PREFIX}${SPLAT_CACHE_VERSION}`;
 
