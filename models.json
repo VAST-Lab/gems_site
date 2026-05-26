@@ -207,6 +207,46 @@
     ]
   },
   {
+    "id": "mushroom-calcite",
+    "name": "Calcite",
+    "src": [
+	  "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/mushroom_calcite.spz",
+      "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/mushroom_calcite.sog",
+      "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/mushroom_calcite.ply"
+    ],
+    "thumb": "thumbs/mushroom_calcite.jpg",
+	"description": "",
+    "author": "VAST Lab",
+    "rotation": {
+      "x": 180,
+      "y": 0,
+      "z": 0
+    },
+    "offset": {
+      "x": -3,
+      "y": -38,
+      "z": 0
+    },
+    "date": "2026-05-20",
+    "tags": [
+      "splat",
+	  "ply",
+	  "scan"
+    ],
+    "polycount": 990666,
+    "software": "Gaussian Splatting",
+    "location": {
+      "label": ""
+    },
+    "dimensions": "",
+    "badgeColor": "#ff8c00",
+    "compounds": [
+      { "symbol": "Si", "number": 14, "name": "Silicon", "color": "#336b77", "glow": "#4d78a8" },
+      { "symbol": "O", "number": 8, "name": "Oxygen", "color": "#45698f", "glow": "#457f89" },
+	  { "symbol": "Fe", "number": 26, "name": "Iron", "color": "#8d7740", "glow": "#457f89" }
+    ]
+  },
+  {
     "id": "NTN25-15",
     "name": "Malachite ps. Azurite (early 1900s)",
     "src": [
