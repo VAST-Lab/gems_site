@@ -372,11 +372,124 @@ function applyModelRotation(obj3d, modelMeta, { defaultSplatFix = false } = {}) 
   fill.position.set(-4, 2, -2);
   scene.add(fill);
 
+<<<<<<< Updated upstream
   const groundMat = new THREE.MeshStandardMaterial({ color: 0x0f1117, roughness: 1 });
   const ground = new THREE.Mesh(new THREE.CircleGeometry(60, 96), groundMat);
   ground.rotation.x = -Math.PI / 2;
   ground.position.y = -9999;
   scene.add(ground);
+=======
+  window.addEventListener("pointermove", (e) => {
+    const dx = e.clientX - lastX;
+    const dy = e.clientY - lastY;
+    lastX    = e.clientX;
+    lastY    = e.clientY;
+
+    if (pointerDown && !rightDown) {
+      // Orbit (left-drag)
+      orbit.spherical.theta -= dx * 0.005;
+      orbit.spherical.phi    = Math.max(
+        0.05,
+        Math.min(Math.PI - 0.05, orbit.spherical.phi - dy * 0.005)
+      );
+    } else if (rightDown) {
+      // Pan
+      const panSpeed = orbit.spherical.r * 0.001;
+      const right    = new pc.Vec3();
+      const up       = new pc.Vec3();
+      cameraEntity.getLocalTransform().getX(right);
+      cameraEntity.getLocalTransform().getY(up);
+      orbit.target.add(right.mulScalar(-dx * panSpeed));
+      orbit.target.add(up.mulScalar(dy * panSpeed));
+    }
+  });
+
+  window.addEventListener("pointerup", (e) => {
+    if (e.button === 2) { rightDown = false; }
+    else                { pointerDown = false; }
+    orbit.scheduleResume();
+  });
+
+  canvas.addEventListener("wheel", (e) => {
+    orbit.stopAuto();
+    orbit.spherical.r = Math.max(0.1, orbit.spherical.r + e.deltaY * 0.002 * orbit.spherical.r);
+    orbit.scheduleResume();
+  }, { passive: true });
+
+  let pinchStartDistance = null;
+let pinchStartRadius = null;
+
+function getTouchDistance(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.hypot(dx, dy);
+}
+
+canvas.style.touchAction = "none";
+
+canvas.addEventListener("touchstart", (e) => {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    orbit.stopAuto();
+    pinchStartDistance = getTouchDistance(e.touches);
+    pinchStartRadius = orbit.spherical.r;
+  }
+}, { passive: false });
+
+canvas.addEventListener("touchmove", (e) => {
+  if (e.touches.length === 2 && pinchStartDistance && pinchStartRadius) {
+    e.preventDefault();
+
+    const currentDistance = getTouchDistance(e.touches);
+    const scale = pinchStartDistance / currentDistance;
+
+    orbit.spherical.r = Math.max(
+      0.1,
+      Math.min(100, pinchStartRadius * scale)
+    );
+  }
+}, { passive: false });
+
+canvas.addEventListener("touchend", (e) => {
+  if (e.touches.length < 2) {
+    pinchStartDistance = null;
+    pinchStartRadius = null;
+    orbit.scheduleResume();
+  }
+});
+
+  // ── Resize handler ────────────────────────────────────────────────────────
+  function resize() {
+    // Clear inline size so the CSS layout can shrink the canvas freely,
+    // then re-measure and lock it back to pixel-perfect dimensions.
+    canvas.style.width  = "";
+    canvas.style.height = "";
+    const rect = canvas.getBoundingClientRect();
+    const w    = Math.max(1, Math.floor(rect.width));
+    const h    = Math.max(1, Math.floor(rect.height));
+    const pw   = Math.round(w * pixelRatio);
+    const ph   = Math.round(h * pixelRatio);
+    if (canvas.width !== pw || canvas.height !== ph) {
+      canvas.width  = pw;
+      canvas.height = ph;
+      app.resizeCanvas(pw, ph);
+    }
+    canvas.style.width  = `${w}px`;
+    canvas.style.height = `${h}px`;
+    // Always keep aspect ratio in sync so the gem stays centred
+    cameraEntity.camera.aspectRatio = w / h;
+  }
+
+  // Use ResizeObserver on the canvas's parent so we catch layout changes
+  // (window resize, sidebar toggle, panel open/close, etc.) reliably.
+  const _resizeObserver = new ResizeObserver(() => resize());
+  _resizeObserver.observe(canvas.parentElement ?? canvas);
+
+  // Hook into PlayCanvas update loop (orbit only; resize handled above)
+  app.on("update", (dt) => {
+    orbit.tick(dt);
+  });
+>>>>>>> Stashed changes
 
   setLoaderProgress(45);
 
