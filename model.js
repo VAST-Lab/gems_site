@@ -519,6 +519,48 @@ function isSplatFile(url) {
     orbit.scheduleResume();
   }, { passive: true });
 
+  let pinchStartDistance = null;
+let pinchStartRadius = null;
+
+function getTouchDistance(touches) {
+  const dx = touches[0].clientX - touches[1].clientX;
+  const dy = touches[0].clientY - touches[1].clientY;
+  return Math.hypot(dx, dy);
+}
+
+canvas.style.touchAction = "none";
+
+canvas.addEventListener("touchstart", (e) => {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    orbit.stopAuto();
+    pinchStartDistance = getTouchDistance(e.touches);
+    pinchStartRadius = orbit.spherical.r;
+  }
+}, { passive: false });
+
+canvas.addEventListener("touchmove", (e) => {
+  if (e.touches.length === 2 && pinchStartDistance && pinchStartRadius) {
+    e.preventDefault();
+
+    const currentDistance = getTouchDistance(e.touches);
+    const scale = pinchStartDistance / currentDistance;
+
+    orbit.spherical.r = Math.max(
+      0.1,
+      Math.min(100, pinchStartRadius * scale)
+    );
+  }
+}, { passive: false });
+
+canvas.addEventListener("touchend", (e) => {
+  if (e.touches.length < 2) {
+    pinchStartDistance = null;
+    pinchStartRadius = null;
+    orbit.scheduleResume();
+  }
+});
+ 
   // ── Resize handler ────────────────────────────────────────────────────────
   function resize() {
     // Clear inline size so the CSS layout can shrink the canvas freely,
