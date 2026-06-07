@@ -638,9 +638,9 @@ canvas.addEventListener("touchend", (e) => {
 
 		let frameChecks = 0;
 		const tryFrame = () => {
-			// Access the instance via the component
-			const instance = splatEntity.gsplat.instance;
-			const aabb = instance?.meshInstance?.aabb;
+			// Read the AABB directly from the underlying asset resource
+			const assetResource = splatAsset.resource;
+			const aabb = assetResource?.aabb;
 
 			if (aabb && aabb.halfExtents.length() > 0.001) {
 				console.log("Splat detected! Centering and Framing...");

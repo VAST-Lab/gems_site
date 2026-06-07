@@ -140,8 +140,8 @@
       "z": 0
     },
     "offset": {
-      "x": -3,
-      "y": -38,
+      "x": 0,
+      "y": -1.5,
       "z": 0
     },
     "date": "2026-05-13",
@@ -181,8 +181,8 @@
       "z": 0
     },
     "offset": {
-      "x": -3,
-      "y": -38,
+      "x": 0,
+      "y": -0.25,
       "z": 0
     },
     "date": "2026-05-14",
@@ -199,6 +199,86 @@
       "label": "Chihuahuan Desert"
     },
     "dimensions": "10.414 x 5.842 x 3.175 cm",
+    "badgeColor": "#ff8c00",
+    "compounds": [
+      { "symbol": "Si", "number": 14, "name": "Silicon", "color": "#336b77", "glow": "#4d78a8" },
+      { "symbol": "O", "number": 8, "name": "Oxygen", "color": "#45698f", "glow": "#457f89" },
+	  { "symbol": "Fe", "number": 26, "name": "Iron", "color": "#8d7740", "glow": "#457f89" }
+    ]
+  },
+  {
+    "id": "mushroom-calcite",
+    "name": "Calcite",
+    "src": [
+	  "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/mushroom_calcite.spz",
+      "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/mushroom_calcite.sog",
+      "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/mushroom_calcite.ply"
+    ],
+    "thumb": "thumbs/mushroom_calcite.jpg",
+	"description": "",
+    "author": "VAST Lab",
+    "rotation": {
+      "x": 180,
+      "y": 0,
+      "z": 0
+    },
+    "offset": {
+      "x": 0,
+      "y": -10,
+      "z": 0
+    },
+    "date": "2026-05-20",
+    "tags": [
+      "splat",
+	  "ply",
+	  "scan"
+    ],
+    "polycount": 990666,
+    "software": "Gaussian Splatting",
+    "location": {
+      "label": ""
+    },
+    "dimensions": "",
+    "badgeColor": "#ff8c00",
+    "compounds": [
+      { "symbol": "Si", "number": 14, "name": "Silicon", "color": "#336b77", "glow": "#4d78a8" },
+      { "symbol": "O", "number": 8, "name": "Oxygen", "color": "#45698f", "glow": "#457f89" },
+	  { "symbol": "Fe", "number": 26, "name": "Iron", "color": "#8d7740", "glow": "#457f89" }
+    ]
+  },
+  {
+    "id": "sphalerite",
+    "name": "Sphalerite",
+    "src": [
+	  "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/sphalerite.spz",
+      "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/sphalerite.sog",
+      "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/sphalerite.ply"
+    ],
+    "thumb": "thumbs/sphalerite.jpg",
+	"description": "",
+    "author": "VAST Lab",
+    "rotation": {
+      "x": 180,
+      "y": 0,
+      "z": 0
+    },
+    "offset": {
+      "x": 0,
+      "y": -15,
+      "z": 0
+    },
+    "date": "2026-05-20",
+    "tags": [
+      "splat",
+	  "ply",
+	  "scan"
+    ],
+    "polycount": 990666,
+    "software": "Gaussian Splatting",
+    "location": {
+      "label": ""
+    },
+    "dimensions": "",
     "badgeColor": "#ff8c00",
     "compounds": [
       { "symbol": "Si", "number": 14, "name": "Silicon", "color": "#336b77", "glow": "#4d78a8" },
