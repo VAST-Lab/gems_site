@@ -1,26 +1,21 @@
 {
   "name": "gems_site",
   "version": "1.0.0",
-  "description": "",
-  "main": "count_splats.js",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/VAST-Lab/gems_site.git"
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.22.3"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/VAST-Lab/gems_site/issues"
-  },
-  "homepage": "https://github.com/VAST-Lab/gems_site#readme",
   "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "tailwindcss": "^4.0.0",
     "vite": "^8.3.0"
   }
 }

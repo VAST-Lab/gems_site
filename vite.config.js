@@ -1,21 +1,14 @@
 import { defineConfig } from 'vite';
-import { resolve } from 'path';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  build: {
-    rollupOptions: {
-      input: {
-        main: resolve(__dirname, 'src/pages/index.html'),
-        convert: resolve(__dirname, 'src/pages/convert.html'),
-        directions: resolve(__dirname, 'src/pages/directions.html'),
-        model: resolve(__dirname, 'src/pages/model.html'),
-        order: resolve(__dirname, 'src/pages/order-disclosure.html'),
-        search: resolve(__dirname, 'src/pages/search.html'),
-        vault: resolve(__dirname, 'src/pages/vault.html')
-      }
-    }
-  },
+  base: '/gems_site/',
+  plugins: [
+    react(),
+    tailwindcss(),
+  ],
   server: {
-    open: '/src/pages/index.html'
+    open: true
   }
 });

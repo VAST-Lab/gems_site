@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@theme {
+    --color-bg: #0b0c10;
+    --color-panel: #12141c;
+    --color-card: #0f1117;
+    --color-text: #e9ecf1;
+    --color-muted: #aab2c0;
+    --color-border: rgba(255, 255, 255, 0.10);
+    --color-border2: rgba(255, 255, 255, 0.16);
+    --color-chip: rgba(255, 255, 255, 0.06);
+    --color-chip-on: rgba(255, 255, 255, 0.14);
+}
