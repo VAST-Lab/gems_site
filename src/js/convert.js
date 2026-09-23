@@ -36,10 +36,10 @@ async function loadFile(file) {
   setStatus("Loading model…");
   convertBtn.disabled = true;
 
-  const THREE = await import("https://cdn.jsdelivr.net/npm/three@0.161/build/three.module.js");
-  const { GLTFLoader } = await import("https://cdn.jsdelivr.net/npm/three@0.161/examples/jsm/loaders/GLTFLoader.js");
-  const { DRACOLoader } = await import("https://cdn.jsdelivr.net/npm/three@0.161/examples/jsm/loaders/DRACOLoader.js");
-  const { MeshoptDecoder } = await import("https://cdn.jsdelivr.net/npm/three@0.161/examples/jsm/libs/meshopt_decoder.module.js");
+  const THREE = await import("https://cdn.jsdelivr.net/npm/three@0.178/build/three.module.js");
+  const { GLTFLoader } = await import("https://cdn.jsdelivr.net/npm/three@0.178/examples/jsm/loaders/GLTFLoader.js");
+  const { DRACOLoader } = await import("https://cdn.jsdelivr.net/npm/three@0.178/examples/jsm/loaders/DRACOLoader.js");
+  const { MeshoptDecoder } = await import("https://cdn.jsdelivr.net/npm/three@0.178/examples/jsm/libs/meshopt_decoder.module.js");
 
   const loader = new GLTFLoader();
   const draco = new DRACOLoader();
@@ -72,7 +72,7 @@ async function exportAndDownload() {
   setStatus("Exporting…");
   convertBtn.disabled = true;
 
-  const { GLTFExporter } = await import("https://cdn.jsdelivr.net/npm/three@0.161/examples/jsm/exporters/GLTFExporter.js");
+  const { GLTFExporter } = await import("https://cdn.jsdelivr.net/npm/three@0.178/examples/jsm/exporters/GLTFExporter.js");
   const exporter = new GLTFExporter();
 
   const options = {
@@ -91,14 +91,14 @@ async function exportAndDownload() {
           downloadBlob(blob, `${outName}.glb`);
           setStatus("Downloaded GLB.");
         } else {
-      
+
           const JSZip = (await import("https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js")).default;
           const zip = new JSZip();
 
           const gltfJson = JSON.stringify(result, null, 2);
           zip.file(`${outName}.gltf`, gltfJson);
 
-       
+
           if (result && result.buffers && result.buffers.length) {
             const b0 = result.buffers[0];
             if (b0.uri && b0.uri.startsWith("data:")) {

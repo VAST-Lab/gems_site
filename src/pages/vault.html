@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>The Vault | GemScan</title>
+    <link rel="icon" type="image/x-icon" href="../../public/assets/icons/favicon.ico">
+    <link rel="stylesheet" href="/src/css/styles.css" />
+    <style>
+        .vault-login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, .02);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .vault-login-container h2 {
+            margin-top: 0;
+        }
+
+        .vault-input {
+            width: 100%;
+            padding: 12px;
+            margin: 16px 0;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, .05);
+            color: var(--text);
+        }
+
+        .vault-btn {
+            width: 100%;
+            padding: 12px;
+            background: #6b3a97;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .vault-error {
+            color: #ff6b6b;
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        #vault-content {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="shell">
+        <div class="content">
+            <main class="wrap">
+
+                <!-- Password Overlay -->
+                <div id="vault-login" class="vault-login-container">
+                    <h2>Protected Vault</h2>
+                    <p class="muted">Enter the password to access restricted specimens.</p>
+                    <form id="vault-form">
+                        <input type="password" id="vault-password" class="vault-input" placeholder="Password" required
+                            autofocus />
+                        <button type="submit" class="vault-btn">Unlock</button>
+                        <div id="vault-error" class="vault-error">Incorrect password.</div>
+                    </form>
+                </div>
+
+                <!-- Secure Content -->
+                <div id="vault-content">
+                    <section class="search-hero">
+                        <h1 class="search-title">The Vault</h1>
+                        <p class="search-intro">Exclusive, password-protected mineral catalog.</p>
+                    </section>
+                    <section id="grid" class="grid" aria-live="polite"></section>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initSidebar } from '../components/sidebar.js';
+        import { initTopbar } from '../components/topbar.js';
+
+        initSidebar();
+        initTopbar();
+    </script>
+    <script type="module" src="/src/js/model.js"></script>
+</body>
+
+</html>
