@@ -2,3 +2,4 @@ splats/*.ply
 node_modules
 .vs
 .vscode
+*.env*

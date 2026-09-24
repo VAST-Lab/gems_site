@@ -1,60 +1,106 @@
-import { useState } from "react";
-import { useModels } from "../context/ModelsContext";
+import { useState, useEffect } from "react";
+import { supabase } from "../lib/supabase";
 import Card from "../components/Card";
 
 export default function Vault() {
   const [password, setPassword] = useState("");
-  const [isUnlocked, setIsUnlocked] = useState(false);
-  const [error, setError] = useState(false);
-  const { models } = useModels();
+  const [error, setError] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
 
-  const handleUnlock = (e) => {
+  const [vaultModels, setVaultModels] = useState([]);
+
+  const fetchVaultData = async () => {
+    // 1. Fetch from Database
+    const { data: modelsData, error: dbError } = await supabase.from("models").select("*");
+
+    if (dbError) {
+      console.error("Database 403 Error:", dbError.message);
+      return;
+    }
+
+    // 2. Fetch from Storage
+    const modelsWithThumbs = await Promise.all(
+      modelsData.map(async (m) => {
+        if (m.thumb) {
+          const { data, error: storageError } = await supabase.storage.from("vault").createSignedUrl(m.thumb, 3600);
+
+          if (storageError) {
+            console.error("Storage 403 Error for", m.thumb, ":", storageError.message);
+            return m;
+          }
+          return { ...m, thumb: data?.signedUrl || m.thumb };
+        }
+        return m;
+      }),
+    );
+
+    setVaultModels(modelsWithThumbs);
+  };
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAuthenticated(!!session);
+      setIsChecking(false);
+    });
+  }, []);
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    if (password === "vast") {
-      setIsUnlocked(true);
-      setError(false);
+    setError("");
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email: "vault@gemscans.com",
+      password: password,
+    });
+
+    if (error) {
+      setError("Incorrect vault password.");
     } else {
-      setError(true);
-      setPassword("");
+      setIsAuthenticated(true);
+      fetchVaultData();
     }
   };
 
-  if (!isUnlocked) {
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setIsAuthenticated(false);
+  };
+
+  if (isChecking) return null;
+
+  if (!isAuthenticated) {
     return (
-      <div className="mx-auto mt-[100px] max-w-[400px] rounded-2xl border border-[rgba(255,255,255,0.1)] bg-white/5 p-8 text-center">
-        <h2 className="mt-0 text-2xl font-bold">Protected Vault</h2>
-        <p className="mt-2 text-sm text-[#aab2c0]">Enter the password to access restricted specimens.</p>
-        <form onSubmit={handleUnlock} className="mt-4">
+      <div className="flex h-[60vh] flex-col items-center justify-center">
+        <h1 className="mb-6 text-2xl font-semibold text-white">Restricted Access</h1>
+        <form onSubmit={handleLogin} className="flex w-full max-w-sm flex-col gap-4">
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mb-4 w-full rounded-xl border border-[rgba(255,255,255,0.1)] bg-white/5 p-3 text-[#e9ecf1] outline-none focus:border-[rgba(255,255,255,0.16)]"
-            placeholder="Password"
-            required
-            autoFocus
+            placeholder="Enter Vault Password"
+            className="rounded-lg border border-white/20 bg-black/40 px-4 py-3 text-white outline-none focus:border-white/60"
           />
-          <button type="submit" className="w-full rounded-xl bg-[#6b3a97] p-3 font-bold text-white transition-all hover:brightness-110">
-            Unlock
+          <button type="submit" className="rounded-lg bg-white/10 px-4 py-3 font-medium text-white transition-colors hover:bg-white/20">
+            Unlock Vault
           </button>
-          {error && <div className="mt-2.5 text-[13px] text-[#ff6b6b]">Incorrect password.</div>}
+          {error && <p className="text-center text-sm text-red-400">{error}</p>}
         </form>
       </div>
     );
   }
 
-  // Temporary filtering for vault-specific models if needed; currently renders all for demonstration
   return (
-    <div className="mx-auto max-w-[1240px] px-4 pb-12 pt-6">
-      <section className="mb-6">
-        <h1 className="my-4 text-[clamp(30px,3.8vw,46px)] font-extrabold leading-tight tracking-tight">The Vault</h1>
-        <p className="m-0 max-w-[72ch] text-[15px] leading-relaxed text-[#aab2c0]">Exclusive, password-protected mineral catalog.</p>
-      </section>
-      <section className="grid grid-cols-[repeat(auto-fill,minmax(230px,1fr))] gap-3.5">
-        {models.map((m) => (
-          <Card key={m.id} model={m} />
-        ))}
-      </section>
-    </div>
+    <section>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-xl font-semibold text-white">Vault Records</h1>
+        <button onClick={handleLogout} className="text-sm text-white/60 hover:text-white transition-colors">
+          Lock Vault
+        </button>
+      </div>
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(230px,1fr))] gap-3.5">
+        {vaultModels.length > 0 ? vaultModels.map((m) => <Card key={m.id} model={m} />) : <div className="text-white/50">No vault models found.</div>}
+      </div>
+    </section>
   );
 }

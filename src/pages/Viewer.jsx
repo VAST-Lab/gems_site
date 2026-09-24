@@ -1,43 +1,102 @@
-import { useEffect, useRef, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useModels } from "../context/ModelsContext";
-import { initViewer } from "../js/viewer.js";
+import { supabase } from "../lib/supabase";
+import { initViewer } from "../js/viewer";
+
 import Sidebar from "../components/Sidebar";
-import PeriodicTableModal from "../components/PeriodicTableModal";
 import Globe from "../components/Globe";
+import PeriodicTableModal from "../components/PeriodicTableModal";
 
 export default function Viewer() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { models, isLoading } = useModels();
-  const canvasRef = useRef(null);
-  const initialized = useRef(false);
+
+  const [model, setModel] = useState(null);
+  const [error, setError] = useState("");
   const [activeElement, setActiveElement] = useState(null);
 
-  const model = models.find((m) => m.id === id);
+  const containerRef = useRef(null);
+  const appRef = useRef(null);
 
   useEffect(() => {
-    if (!model || !canvasRef.current || initialized.current) return;
+    if (isLoading) return;
 
-    let appInstance = null;
-    initViewer(model, canvasRef.current).then((app) => {
-      appInstance = app;
-    });
+    // Check Public
+    const publicModel = models.find((m) => m.id === id);
+    if (publicModel) {
+      setModel(publicModel);
+      return;
+    }
 
-    initialized.current = true;
+    // Check Vault
+    const fetchPrivateModel = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (!session) {
+        navigate("/vault");
+        return;
+      }
+
+      const { data: vaultModel, error } = await supabase.from("models").select("*").eq("id", id).single();
+      if (error || !vaultModel) {
+        setError("Model not found.");
+        return;
+      }
+
+      // Inject runtime flag so the asset loader knows to sign the URLs
+      setModel({ ...vaultModel, isVault: true });
+    };
+
+    fetchPrivateModel();
+  }, [id, models, isLoading, navigate]);
+
+  // 2. Load Assets and Initialize Canvas
+  useEffect(() => {
+    if (!model || !containerRef.current) return;
+    let isMounted = true;
+
+    const loadAssets = async () => {
+      try {
+        let finalUrls = model.src;
+
+        if (model.isVault) {
+          const signedPromises = model.src.map(async (filename) => {
+            const { data, error } = await supabase.storage.from("vault").createSignedUrl(filename, 3600);
+            if (error) throw error;
+            return data.signedUrl;
+          });
+          finalUrls = await Promise.all(signedPromises);
+        }
+
+        if (!isMounted) return;
+
+        const modelToRender = { ...model, src: finalUrls };
+
+        appRef.current = await initViewer(modelToRender, containerRef.current);
+      } catch (err) {
+        console.error("Asset load error:", err);
+        if (isMounted) setError("Failed to secure model assets.");
+      }
+    };
+
+    loadAssets();
 
     return () => {
-      if (appInstance) {
-        appInstance.destroy();
+      isMounted = false;
+      if (appRef.current) {
+        appRef.current.destroy();
+        appRef.current = null;
       }
-      initialized.current = false;
     };
   }, [model]);
 
-  if (isLoading) return <div className="p-4 text-[#aab2c0]">Loading...</div>;
-  if (!model) return <div className="p-4 text-[#aab2c0]">Model not found.</div>;
+  const plySrc = model?.src && Array.isArray(model.src) ? model.src.find((s) => s.toLowerCase().endsWith(".ply")) : null;
 
-  const sources = Array.isArray(model.src) ? model.src : [model.src];
-  const plySrc = sources.find((s) => s?.toLowerCase().endsWith(".ply"));
+  if (error) return <div className="p-8 text-red-400">{error}</div>;
+  if (!model) return <div className="p-8 text-white">Loading viewer...</div>;
 
   return (
     <div className="grid min-h-screen grid-cols-1 bg-[#0b0c10] lg:grid-cols-[220px_1fr]">
@@ -101,14 +160,12 @@ export default function Viewer() {
               </div>
             </div>
 
-            <canvas ref={canvasRef} id="c" className="block h-full w-full touch-none select-none"></canvas>
+            <canvas ref={containerRef} id="c" className="block h-full w-full touch-none select-none"></canvas>
           </div>
 
           <aside className="hidden flex-col overflow-y-auto border-l border-[rgba(255,255,255,0.1)] bg-[#12141c] p-4 lg:flex">
-            {/* 1. Title */}
             <h2 className="mb-2 text-lg font-bold">{model.name}</h2>
 
-            {/* 2. Tags */}
             {model.tags && model.tags.length > 0 && (
               <div className="mb-2 flex flex-wrap gap-1.5">
                 {model.tags.map((t) => (
@@ -119,7 +176,6 @@ export default function Viewer() {
               </div>
             )}
 
-            {/* 3. Author / Dimensions / Location */}
             <div className="mt-2 flex flex-col gap-2 border-t border-[rgba(255,255,255,0.1)] pt-3">
               {model.author && (
                 <div className="flex justify-between text-[13px]">
@@ -141,10 +197,8 @@ export default function Viewer() {
               )}
             </div>
 
-            {/* 4. Globe View */}
             <Globe allModels={models} currentModel={model} />
 
-            {/* 5. Date / Software / Polygons */}
             <div className="mb-3 flex flex-col gap-2 border-t border-[rgba(255,255,255,0.1)] pt-3">
               {model.date && (
                 <div className="flex justify-between text-[13px]">
@@ -166,7 +220,6 @@ export default function Viewer() {
               )}
             </div>
 
-            {/* 6. Download Button */}
             {plySrc && (
               <a
                 href={plySrc}
@@ -177,7 +230,6 @@ export default function Viewer() {
               </a>
             )}
 
-            {/* 7. Description */}
             <div className="mt-1 rounded-xl border border-[rgba(255,255,255,0.1)] bg-white/5 p-3">
               <div className="mb-2 text-xs text-[#aab2c0]">Description</div>
               <p className="m-0 text-[13px] leading-[1.45] text-[#e9ecf1]">{model.description || "No description available."}</p>
@@ -185,7 +237,6 @@ export default function Viewer() {
           </aside>
         </main>
       </div>
-
       <PeriodicTableModal activeSymbol={activeElement} onClose={() => setActiveElement(null)} />
     </div>
   );

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 export default function Card({ model }) {
   const hasSrc = model.src && (Array.isArray(model.src) ? model.src.length > 0 : model.src.trim() !== "");
   const thumb = model.thumb?.trim();
+  const thumbUrl = thumb.startsWith("http") ? thumb : import.meta.env.BASE_URL + `assets/${thumb}`;
   const firstSrc = Array.isArray(model.src) ? model.src[0] : model.src;
   const isGltf = !firstSrc?.toLowerCase().match(/\.(ply|spz|splat|ksplat|sog)$/) && firstSrc?.toLowerCase().match(/\.(glb\vert{}gltf)$/);
 
@@ -19,7 +20,7 @@ export default function Card({ model }) {
     <div className="relative flex aspect-square w-full items-center justify-center overflow-hidden bg-card">
       {badgeContent}
       <img
-        src={import.meta.env.BASE_URL + `assets/${thumb}`}
+        src={thumbUrl}
         alt={model.name}
         loading="lazy"
         className="block aspect-square w-full scale-[0.88] object-contain object-center"
