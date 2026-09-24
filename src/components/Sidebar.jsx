@@ -29,9 +29,7 @@ export default function Sidebar() {
         ))}
       </nav>
       <div className="mt-auto p-2 text-xs leading-[1.35] text-muted">
-        Tip: add models in
-        <br />
-        <code className="font-mono">assets/models</code>
+        VAST Lab, 2026
       </div>
     </aside>
   );

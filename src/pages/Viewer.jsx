@@ -34,9 +34,12 @@ export default function Viewer() {
 
     // Check Vault
     const fetchPrivateModel = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      if (!supabase) {
+        setError("Model not found.");
+        return;
+      }
+      
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         navigate("/vault");
         return;
@@ -72,7 +75,7 @@ export default function Viewer() {
       try {
         let finalUrls = model.src;
 
-        if (model.isVault) {
+        if (model.isVault && supabase) {
           const signedPromises = model.src.map(async (filename) => {
             const { data, error } = await supabase.storage.from("vault").createSignedUrl(filename, 3600);
             if (error) throw error;

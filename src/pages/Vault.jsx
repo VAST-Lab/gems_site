@@ -10,6 +10,15 @@ export default function Vault() {
 
   const [vaultModels, setVaultModels] = useState([]);
 
+  if (!supabase) {
+    return (
+      <div className="flex h-[60vh] flex-col items-center justify-center">
+        <h1 className="mb-2 text-2xl font-semibold text-white">Vault Offline</h1>
+        <p className="text-white/60">Please check again at a later date.</p>
+      </div>
+    );
+  }
+
   const fetchVaultData = async () => {
     // 1. Fetch from Database
     const { data: modelsData, error: dbError } = await supabase.from("models").select("*");
