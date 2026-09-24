@@ -51,6 +51,9 @@ export default function Vault() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setIsAuthenticated(!!session);
       setIsChecking(false);
+      if (session) {
+        fetchVaultData();
+      }
     });
   }, []);
 

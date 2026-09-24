@@ -180,9 +180,10 @@ export async function initViewer(m, canvas) {
 	let finalSrc;
 	setLoaderProgress(5);
 
-	const renderSources = sources.filter((s) => !s.toLowerCase().endsWith(".ply"));
-	const sogSrc = renderSources.find((s) => s.toLowerCase().endsWith(".sog"));
-	const spzSrc = renderSources.find((s) => s.toLowerCase().endsWith(".spz"));
+	const cleanUrl = (url) => (url ?? "").split("?")[0].toLowerCase();
+	const renderSources = sources.filter((s) => !cleanUrl(s).endsWith(".ply"));
+	const sogSrc = renderSources.find((s) => cleanUrl(s).endsWith(".sog"));
+	const spzSrc = renderSources.find((s) => cleanUrl(s).endsWith(".spz"));
 	const preferredSrc = sogSrc ?? spzSrc ?? renderSources[0];
 	const checkList = preferredSrc ? [preferredSrc, ...renderSources.filter((s) => s !== preferredSrc)] : renderSources;
 

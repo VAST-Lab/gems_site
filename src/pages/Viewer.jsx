@@ -126,7 +126,7 @@ export default function Viewer() {
 
       <div className="relative flex h-screen min-w-0 flex-col overflow-hidden">
         <div className="z-10 flex shrink-0 items-center gap-3 border-b border-[rgba(255,255,255,0.1)] bg-[#0b0c10]/86 px-4 py-3.5 backdrop-blur-md sm:py-5">
-          <Link to="/" className="text-[#e9ecf1] opacity-90 no-underline hover:opacity-100">
+          <Link to={model.isVault ? "/vault" : "/"} className="text-[#e9ecf1] opacity-90 no-underline hover:opacity-100">
             ← Back
           </Link>
           <div className="text-[13px] text-[#aab2c0]">{model.name}</div>
