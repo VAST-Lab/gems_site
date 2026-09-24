@@ -25,7 +25,7 @@ function hideLoaderOverlay(delay = 180) {
 
 function isSplatFile(url) {
 	if (Array.isArray(url)) url = url[0];
-	const u = (url ?? "").toLowerCase();
+	const u = (url ?? "").split('?')[0].toLowerCase();
 	return u.endsWith(".ply") || u.endsWith(".spz") || u.endsWith(".splat") || u.endsWith(".ksplat") || u.endsWith(".sog");
 }
 
