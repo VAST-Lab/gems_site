@@ -70,7 +70,8 @@ export default function Viewer() {
   useEffect(() => {
     if (!model || !containerRef.current) return;
     let isMounted = true;
-
+    let localApp = null;
+    
     const loadAssets = async () => {
       try {
         let finalUrls = model.src;
@@ -88,7 +89,13 @@ export default function Viewer() {
 
         const modelToRender = { ...model, src: finalUrls };
 
-        appRef.current = await initViewer(modelToRender, containerRef.current);
+        localApp = await initViewer(modelToRender, containerRef.current);
+
+        if (!isMounted) {
+          localApp.destroy();
+        } else {
+          appRef.current = localApp;
+        }
       } catch (err) {
         console.error("Asset load error:", err);
         if (isMounted) setError("Failed to secure model assets.");
@@ -102,6 +109,8 @@ export default function Viewer() {
       if (appRef.current) {
         appRef.current.destroy();
         appRef.current = null;
+      } else if (localApp) {
+        localApp.destroy();
       }
     };
   }, [model]);
