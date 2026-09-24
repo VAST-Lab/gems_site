@@ -16,6 +16,7 @@ export default function Viewer() {
   const [model, setModel] = useState(null);
   const [error, setError] = useState("");
   const [activeElement, setActiveElement] = useState(null);
+  const [globeModels, setGlobeModels] = useState([]);
 
   const containerRef = useRef(null);
   const appRef = useRef(null);
@@ -27,6 +28,7 @@ export default function Viewer() {
     const publicModel = models.find((m) => m.id === id);
     if (publicModel) {
       setModel(publicModel);
+      setGlobeModels(models);
       return;
     }
 
@@ -40,14 +42,22 @@ export default function Viewer() {
         return;
       }
 
-      const { data: vaultModel, error } = await supabase.from("models").select("*").eq("id", id).single();
-      if (error || !vaultModel) {
+      // Get Vault Gems for Globe
+      const { data: vaultModels, error } = await supabase.from("models").select("*");
+      if (error || !vaultModels) {
         setError("Model not found.");
         return;
       }
 
-      // Inject runtime flag so the asset loader knows to sign the URLs
-      setModel({ ...vaultModel, isVault: true });
+      const currentVaultModel = vaultModels.find((m) => m.id === id);
+      if (!currentVaultModel) {
+        setError("Model not found.");
+        return;
+      }
+
+      setModel({ ...currentVaultModel, isVault: true });
+
+      setGlobeModels(vaultModels.map((m) => ({ ...m, isVault: true })));
     };
 
     fetchPrivateModel();
@@ -197,7 +207,7 @@ export default function Viewer() {
               )}
             </div>
 
-            <Globe allModels={models} currentModel={model} />
+            <Globe allModels={globeModels} currentModel={model} />
 
             <div className="mb-3 flex flex-col gap-2 border-t border-[rgba(255,255,255,0.1)] pt-3">
               {model.date && (
