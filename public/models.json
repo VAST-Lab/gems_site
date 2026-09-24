@@ -21,11 +21,7 @@
       "z": 0
     },
     "date": "2026-03-04",
-    "tags": [
-      "splat",
-      "ply",
-      "scan"
-    ],
+    "tags": ["splat", "ply", "scan"],
     "polycount": 968057,
     "software": "Gaussian Splatting",
     "location": {
@@ -63,11 +59,7 @@
       "z": 5
     },
     "date": "2026-03-04",
-    "tags": [
-      "splat",
-      "ply",
-      "scan"
-    ],
+    "tags": ["splat", "ply", "scan"],
     "polycount": 993958,
     "software": "Gaussian Splatting",
     "location": {
@@ -104,11 +96,7 @@
       "z": 0
     },
     "date": "2026-03-04",
-    "tags": [
-      "splat",
-      "ply",
-      "scan"
-    ],
+    "tags": ["splat", "ply", "scan"],
     "polycount": 970764,
     "software": "Gaussian Splatting",
     "location": {
@@ -145,11 +133,7 @@
       "z": 0
     },
     "date": "2026-05-13",
-    "tags": [
-      "splat",
-      "ply",
-      "scan"
-    ],
+    "tags": ["splat", "ply", "scan"],
     "polycount": 883987,
     "software": "Gaussian Splatting",
     "location": {
@@ -186,11 +170,7 @@
       "z": 0
     },
     "date": "2026-05-14",
-    "tags": [
-      "splat",
-      "ply",
-      "scan"
-    ],
+    "tags": ["splat", "ply", "scan"],
     "polycount": 836275,
     "software": "Gaussian Splatting",
     "location": {
@@ -203,19 +183,19 @@
     "compounds": [
       { "symbol": "Si", "number": 14, "name": "Silicon", "color": "#336b77", "glow": "#4d78a8" },
       { "symbol": "O", "number": 8, "name": "Oxygen", "color": "#45698f", "glow": "#457f89" },
-	  { "symbol": "Fe", "number": 26, "name": "Iron", "color": "#8d7740", "glow": "#457f89" }
+      { "symbol": "Fe", "number": 26, "name": "Iron", "color": "#8d7740", "glow": "#457f89" }
     ]
   },
   {
     "id": "mushroom-calcite",
     "name": "Calcite",
     "src": [
-	  "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/mushroom_calcite.spz",
+      "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/mushroom_calcite.spz",
       "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/mushroom_calcite.sog",
       "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/mushroom_calcite.ply"
     ],
     "thumb": "thumbs/mushroom_calcite.jpg",
-	"description": "",
+    "description": "",
     "author": "VAST Lab",
     "rotation": {
       "x": 180,
@@ -228,11 +208,7 @@
       "z": 0
     },
     "date": "2026-05-20",
-    "tags": [
-      "splat",
-	  "ply",
-	  "scan"
-    ],
+    "tags": ["splat", "ply", "scan"],
     "polycount": 990666,
     "software": "Gaussian Splatting",
     "location": {
@@ -243,19 +219,19 @@
     "compounds": [
       { "symbol": "Si", "number": 14, "name": "Silicon", "color": "#336b77", "glow": "#4d78a8" },
       { "symbol": "O", "number": 8, "name": "Oxygen", "color": "#45698f", "glow": "#457f89" },
-	  { "symbol": "Fe", "number": 26, "name": "Iron", "color": "#8d7740", "glow": "#457f89" }
+      { "symbol": "Fe", "number": 26, "name": "Iron", "color": "#8d7740", "glow": "#457f89" }
     ]
   },
   {
     "id": "sphalerite",
     "name": "Sphalerite",
     "src": [
-	  "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/sphalerite.spz",
+      "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/sphalerite.spz",
       "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/sphalerite.sog",
       "https://huggingface.co/datasets/vastlabstudent/Gems_Splats/resolve/main/sphalerite.ply"
     ],
     "thumb": "thumbs/sphalerite.jpg",
-	"description": "",
+    "description": "",
     "author": "VAST Lab",
     "rotation": {
       "x": 180,
@@ -268,11 +244,7 @@
       "z": 0
     },
     "date": "2026-05-20",
-    "tags": [
-      "splat",
-	  "ply",
-	  "scan"
-    ],
+    "tags": ["splat", "ply", "scan"],
     "polycount": 990666,
     "software": "Gaussian Splatting",
     "location": {
@@ -283,7 +255,7 @@
     "compounds": [
       { "symbol": "Si", "number": 14, "name": "Silicon", "color": "#336b77", "glow": "#4d78a8" },
       { "symbol": "O", "number": 8, "name": "Oxygen", "color": "#45698f", "glow": "#457f89" },
-	  { "symbol": "Fe", "number": 26, "name": "Iron", "color": "#8d7740", "glow": "#457f89" }
+      { "symbol": "Fe", "number": 26, "name": "Iron", "color": "#8d7740", "glow": "#457f89" }
     ]
   }
 ]

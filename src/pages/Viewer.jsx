@@ -171,7 +171,7 @@ export default function Viewer() {
               <a
                 href={plySrc}
                 download={plySrc.split("/").pop()}
-                className="mx-auto mb-4 block w-fit rounded-lg border border-white/40 bg-transparent px-4 py-2 text-[13px] text-white underline underline-offset-[10px] transition-all duration-200 hover:border-white hover:bg-white/5 hover:no-underline"
+                className="mx-auto mb-4 block w-fit rounded-lg border border-white/40 bg-transparent px-4 py-2 text-[13px] text-white no-underline transition-all duration-200 hover:border-white hover:bg-white/5 hover:no-underline"
               >
                 Download Model
               </a>
