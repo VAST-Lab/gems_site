@@ -11,3 +11,14 @@
     --color-chip: rgba(255, 255, 255, 0.06);
     --color-chip-on: rgba(255, 255, 255, 0.14);
 }
+
+@keyframes mine {
+    0% { transform: rotate(0deg); }
+    50% { transform: rotate(-45deg); }
+    100% { transform: rotate(0deg); }
+  }
+  
+  .animate-mine {
+    animation: mine 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    transform-origin: bottom left;
+  }

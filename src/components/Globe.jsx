@@ -166,7 +166,7 @@ export default function Globe({ currentModel, allModels }) {
       if (controls) controls.dispose();
       if (renderer) {
         renderer.dispose();
-        renderer.forceContextLoss();
+        //renderer.forceContextLoss();
       }
       if (globe) {
         globe.geometry.dispose();
