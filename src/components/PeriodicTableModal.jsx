@@ -113,7 +113,7 @@ export default function PeriodicTableModal({ activeSymbol, onClose }) {
       if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", handleEsc);
-    if (activeSymbol) document.body.style.overflow = "hidden";
+    if (activeSymbol && activeSymbol.length > 0) document.body.style.overflow = "hidden";
 
     return () => {
       window.removeEventListener("keydown", handleEsc);
@@ -121,7 +121,7 @@ export default function PeriodicTableModal({ activeSymbol, onClose }) {
     };
   }, [activeSymbol, onClose]);
 
-  if (!activeSymbol) return null;
+  if (!activeSymbol || activeSymbol.length === 0) return null;
 
   const cells = [];
   for (let row = 1; row <= 9; row++) {
@@ -132,7 +132,7 @@ export default function PeriodicTableModal({ activeSymbol, onClose }) {
         continue;
       }
 
-      const isActive = el.symbol === activeSymbol;
+      const isActive = activeSymbol.includes(el.symbol);
 
       cells.push(
         <div

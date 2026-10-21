@@ -15,7 +15,7 @@ function setLoaderProgress(value) {
 	if (loaderLabel) loaderLabel.textContent = `${pct}%`;
 }
 
-function hideLoaderOverlay(delay = 180) {
+function hideLoaderOverlay(delay = 800) {
 	setLoaderProgress(100);
 	window.setTimeout(() => {
 		const loaderOverlay = document.getElementById("loader-overlay");
@@ -649,7 +649,7 @@ export async function initViewer(m, canvas) {
 
 							frameBoundingBox(centeredAABB, gemRoot.getPosition(), getCameraPadding(m));
 
-							orbit.panOffset.copy(getViewOffset(m));
+							orbit.panOffset.set(0,0);
 							cameraEntity.camera.projectionOffset = orbit.panOffset;
 
 							frameBoundingBox(centeredAABB, gemRoot.getPosition(), getCameraPadding(m));

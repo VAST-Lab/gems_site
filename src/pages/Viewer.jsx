@@ -152,7 +152,7 @@ export default function Viewer() {
                 {model.compounds.map((c) => (
                   <button
                     key={c.symbol}
-                    onClick={() => setActiveElement(c.symbol)}
+                    onClick={() => setActiveElement(model.compounds.map(item => item.symbol))}
                     className="flex h-[68px] w-[54px] cursor-pointer flex-col items-center justify-start rounded-md border-0 pt-1.5 text-[#e9ecf1] backdrop-blur-sm sm:h-14 sm:w-11 sm:rounded-lg"
                     style={{
                       background: `linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01)), ${c.color || "#36577d"}`,
@@ -170,6 +170,10 @@ export default function Viewer() {
             )}
 
             <div id="loader-overlay" className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#0b0c10]/82">
+            <img 
+                src={`${import.meta.env.BASE_URL}assets/img/img_2070.png`} 
+                className="mb-2 h-16 w-16 animate-mine"
+              />
               <div className="mt-3.5 text-sm text-[#e9ecf1]">Loading Model...</div>
               <div className="mt-3 h-2.5 w-[min(240px,70%)] overflow-hidden rounded-full border border-white/10 bg-white/10">
                 <div
