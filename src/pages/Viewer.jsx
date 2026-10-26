@@ -116,6 +116,8 @@ export default function Viewer() {
   }, [model]);
 
   const plySrc = model?.src && Array.isArray(model.src) ? model.src.find((s) => s.toLowerCase().endsWith(".ply")) : null;
+  const sogSrc = model?.src && Array.isArray(model.src) ? model.src.find((s) => s.toLowerCase().endsWith(".sog")) : null;
+  const spzSrc = model?.src && Array.isArray(model.src) ? model.src.find((s) => s.toLowerCase().endsWith(".spz")) : null;
 
   if (error) return <div className="p-8 text-red-400">{error}</div>;
   if (!model) return <div className="p-8 text-white">Loading viewer...</div>;
@@ -246,15 +248,38 @@ export default function Viewer() {
               )}
             </div>
 
+            <div className="mb-4 flex flex-col items-center gap-2 border-t border-[rgba(255, 255, 255, 0.1)] pt-4">
+              <div className="text-xs text=[#aab2c0]">Downloads</div>
+              <div className="flex flex-wrap justify-center gap-2">
             {plySrc && (
               <a
                 href={plySrc}
                 download={plySrc.split("/").pop()}
-                className="mx-auto mb-4 block w-fit rounded-lg border border-white/40 bg-transparent px-4 py-2 text-[13px] text-white no-underline transition-all duration-200 hover:border-white hover:bg-white/5 hover:no-underline"
+                className="block rounded-lg border border-white/40 bg-transparent px-3 py-1.5 text-[12px] text-white no-underline transition-all duration-200 hover:border-white hover:bg-white/5 hover:no-underline"
               >
-                Download Model
+                .PLY
               </a>
             )}
+            {sogSrc && (
+              <a
+                href={sogSrc}
+                download={sogSrc.split("/").pop()}
+                className="block rounded-lg border border-white/40 bg-transparent px-3 py-1.5 text-[12px] text-white no-underline transition-all duration-200 hover:border-white hover:bg-white/5 hover:no-underline"
+              >
+                .SOG
+              </a>
+            )}
+            {spzSrc && (
+              <a
+                href={spzSrc}
+                download={spzSrc.split("/").pop()}
+                className="block rounded-lg border border-white/40 bg-transparent px-3 py-1.5 text-[12px] text-white no-underline transition-all duration-200 hover:border-white hover:bg-white/5 hover:no-underline"
+              >
+                .SPZ
+              </a>
+            )}
+          </div>
+          </div>
 
             <div className="mt-1 rounded-xl border border-[rgba(255,255,255,0.1)] bg-white/5 p-3">
               <div className="mb-2 text-xs text-[#aab2c0]">Description</div>
