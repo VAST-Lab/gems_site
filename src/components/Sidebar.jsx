@@ -2,12 +2,12 @@ import { NavLink } from "react-router-dom";
 
 export default function Sidebar() {
   const navItems = [
+    { path: "/about", label: "About" },
     { path: "/", label: "Explore" },
     { path: "/search", label: "Search" },
     { path: "/vault", label: "The Vault" },
     { path: "/convert", label: "Convert" },
-    { path: "/directions", label: "Directions" },
-    { path: "/order-disclosure", label: "Order Disclosure" },
+    { path: "/contact", label: "Contact" },
   ];
 
   return (
