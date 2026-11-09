@@ -33,11 +33,25 @@ export default function Card({ model }) {
   }, [isInteractive, model]);
 
   const badgeContent = model.badgeColor ? (
-    <div className="absolute right-2 top-2 z-10 grid h-[22px] w-[22px] grid-cols-2 gap-[3px] rounded-md bg-black/45 p-1">
-      <span className="block rounded-[1.5px]" style={{ background: model.badgeColor }}></span>
-      <span className="block rounded-[1.5px]" style={{ background: model.badgeColor }}></span>
-      <span className="block rounded-[1.5px]" style={{ background: model.badgeColor }}></span>
-      <span className="block rounded-[1.5px]" style={{ background: model.badgeColor }}></span>
+    <div 
+      className="absolute right-2 top-2 z-10 flex h-[28px] w-[28px] items-center justify-center rounded-full border border-white/20 bg-black/60 shadow-lg backdrop-blur-md"
+      title="Precious Gem"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill={model.badgeColor}
+        stroke="white"
+        strokeWidth="1"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className="h-[15px] w-[15px]"
+        style={{ filter: `drop-shadow(0 0 4px ${model.badgeColor})` }}
+      >
+        <path d="M6 3h12l4 6-10 13L2 9Z" />
+        <path d="M11 3 8 9l4 13 4-13-3-6" />
+        <path d="M2 9h20" />
+      </svg>
     </div>
   ) : null;
 

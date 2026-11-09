@@ -1,118 +1,134 @@
 import { useState, useEffect } from "react";
-import { supabase } from "../lib/supabase";
+import { useModels } from "../context/ModelsContext";
 import Card from "../components/Card";
 
 export default function Vault() {
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const { models } = useModels();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isChecking, setIsChecking] = useState(true);
-
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [vaultModels, setVaultModels] = useState([]);
 
-  if (!supabase) {
-    return (
-      <div className="flex h-[60vh] flex-col items-center justify-center">
-        <h1 className="mb-2 text-2xl font-semibold text-white">Vault Offline</h1>
-        <p className="text-white/60">Please check again at a later date.</p>
-      </div>
-    );
-  }
-
-  const fetchVaultData = async () => {
-    // 1. Fetch from Database
-    const { data: modelsData, error: dbError } = await supabase.from("models").select("*");
-
-    if (dbError) {
-      console.error("Database 403 Error:", dbError.message);
-      return;
-    }
-
-    // 2. Fetch from Storage
-    const modelsWithThumbs = await Promise.all(
-      modelsData.map(async (m) => {
-        if (m.thumb) {
-          const { data, error: storageError } = await supabase.storage.from("vault").createSignedUrl(m.thumb, 3600);
-
-          if (storageError) {
-            console.error("Storage 403 Error for", m.thumb, ":", storageError.message);
-            return m;
-          }
-          return { ...m, thumb: data?.signedUrl || m.thumb };
-        }
-        return m;
-      }),
-    );
-
-    setVaultModels(modelsWithThumbs);
-  };
-
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setIsAuthenticated(!!session);
-      setIsChecking(false);
-      if (session) {
-        fetchVaultData();
-      }
-    });
-  }, []);
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError("");
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email: "vault@gemscans.com",
-      password: password,
-    });
-
-    if (error) {
-      setError("Incorrect vault password.");
-    } else {
-      setIsAuthenticated(true);
-      fetchVaultData();
+    if (isAuthenticated && models) {
+      const preciousGems = models.filter(m => m.badgeColor);
+      setVaultModels(preciousGems.map(m => ({ ...m, isVault: true })));
     }
+  }, [isAuthenticated, models]);
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    
+    setTimeout(() => {
+      if (username === "admin" && password === "admin") {
+        setIsAuthenticated(true);
+      } else {
+        setError("Invalid login credentials. Try admin / password123");
+      }
+      setLoading(false);
+    }, 600);
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
+  const handleLogout = () => {
     setIsAuthenticated(false);
+    setUsername("");
+    setPassword("");
+    setVaultModels([]);
   };
-
-  if (isChecking) return null;
 
   if (!isAuthenticated) {
     return (
-      <div className="flex h-[60vh] flex-col items-center justify-center">
-        <h1 className="mb-6 text-2xl font-semibold text-white">Restricted Access</h1>
-        <form onSubmit={handleLogin} className="flex w-full max-w-sm flex-col gap-4">
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Enter Vault Password"
-            className="rounded-lg border border-white/20 bg-black/40 px-4 py-3 text-white outline-none focus:border-white/60"
-          />
-          <button type="submit" className="rounded-lg bg-white/10 px-4 py-3 font-medium text-white transition-colors hover:bg-white/20">
-            Unlock Vault
-          </button>
-          {error && <p className="text-center text-sm text-red-400">{error}</p>}
-        </form>
+      <div className="flex min-h-[70vh] flex-col items-center justify-center px-4">
+        <div className="w-full max-w-[400px] rounded-xl border border-[rgba(255,255,255,0.1)] bg-[#0b0c10] p-8 shadow-2xl">
+          <h1 className="mb-2 text-center text-2xl font-bold tracking-wide text-[#00cfcf]">
+            Vault Access
+          </h1>
+          <p className="mb-8 text-center text-sm text-[#aab2c0]">
+            Enter credentials to view protected gems.<br/>
+          </p>
+
+          <form onSubmit={handleLogin} className="flex flex-col gap-5">
+            <div>
+              <label className="mb-2 block text-[13px] font-medium text-[#e9ecf1]">
+                Username
+              </label>
+              <input
+                type="text"
+                required
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="h-11 w-full rounded border border-white/20 bg-black/40 px-3 text-[#e9ecf1] outline-none transition-colors focus:border-[#00cfcf]"
+                placeholder="Enter username"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-[13px] font-medium text-[#e9ecf1]">
+                Password
+              </label>
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="h-11 w-full rounded border border-white/20 bg-black/40 px-3 text-[#e9ecf1] outline-none transition-colors focus:border-[#00cfcf]"
+                placeholder="••••••••"
+              />
+            </div>
+
+            {error && (
+              <div className="text-center text-xs font-medium text-red-400">
+                {error}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="mt-2 cursor-pointer rounded bg-[#00cfcf] px-4 py-3 text-sm font-bold text-black transition-colors hover:bg-cyan-300 disabled:opacity-50"
+            >
+              {loading ? "Authenticating..." : "Unlock Vault"}
+            </button>
+          </form>
+        </div>
       </div>
     );
   }
 
   return (
-    <section>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-white">Vault Records</h1>
-        <button onClick={handleLogout} className="text-sm text-white/60 hover:text-white transition-colors">
+    <div className="mx-auto max-w-[1240px] px-4 pb-12 pt-6 sm:px-6 sm:pt-8">
+      <div className="mb-8 flex flex-col items-start justify-between gap-4 border-b border-white/10 pb-6 sm:flex-row sm:items-center">
+        <div>
+          <h1 className="m-0 text-[clamp(24px,3vw,36px)] font-bold leading-tight tracking-tight text-[#e9ecf1]">
+            The Vault
+          </h1>
+          <p className="mt-2 max-w-[600px] text-sm text-[#aab2c0]">
+            Secure collection of high-resolution diamond and precious gem scans.
+          </p>
+        </div>
+        <button
+          onClick={handleLogout}
+          className="cursor-pointer rounded border border-white/20 bg-black/40 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-white/10"
+        >
           Lock Vault
         </button>
       </div>
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(230px,1fr))] gap-3.5">
-        {vaultModels.length > 0 ? vaultModels.map((m) => <Card key={m.id} model={m} />) : <div className="text-white/50">No vault models found.</div>}
-      </div>
-    </section>
+
+      {vaultModels.length > 0 ? (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:gap-6">
+          {vaultModels.map((model) => (
+            <Card key={model.id} model={model} />
+          ))}
+        </div>
+      ) : (
+        <div className="flex h-[40vh] items-center justify-center">
+          <div className="text-[#aab2c0]">The vault is currently empty.</div>
+        </div>
+      )}
+    </div>
   );
 }
