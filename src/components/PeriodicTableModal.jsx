@@ -137,16 +137,16 @@ export default function PeriodicTableModal({ activeSymbol, onClose }) {
       cells.push(
         <div
           key={el.symbol}
-          className={`flex min-h-[34px] flex-col justify-between rounded px-1 py-0.5 text-[#f3f6fb] transition-transform ${
+          className={`flex aspect-square flex-col justify-between rounded p-1 text-[#f3f6fb] transition-transform sm:rounded-md sm:p-1.5 md:p-2 ${
             isActive
-              ? "scale-[1.03] outline outline-2 outline-[#d9f3ff] shadow-[0_0_0_1px_rgba(255,255,255,0.20),0_0_14px_rgba(125,211,252,0.22)]"
+              ? "scale-[1.1] z-10 outline outline-2 outline-[#d9f3ff] shadow-[0_0_0_1px_rgba(255,255,255,0.20),0_0_14px_rgba(125,211,252,0.22)]"
               : "opacity-70 saturate-[.40]"
           }`}
           style={{ background: CATEGORY_COLORS[el.category] || "#3f4d63", boxShadow: "inset 0 1px 0 rgba(255,255,255,.05)" }}
         >
-          <div className="text-[8px] leading-none text-white/70 sm:text-[7px]">{el.number}</div>
-          <div className="text-lg font-bold leading-none sm:text-[13px]">{el.symbol}</div>
-        </div>,
+          <div className="text-[7px] leading-none text-white/70 sm:text-[9px] md:text-[10px]">{el.number}</div>
+          <div className="text-[12px] font-bold leading-none sm:text-[15px] md:text-[18px]">{el.symbol}</div>
+        </div>
       );
     }
   }
@@ -158,14 +158,21 @@ export default function PeriodicTableModal({ activeSymbol, onClose }) {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="h-screen w-full max-w-[660px] overflow-auto border-r border-[rgba(255,255,255,0.1)] bg-[linear-gradient(180deg,rgba(18,20,28,0.98),rgba(11,12,16,0.98))] shadow-[10px_0_30px_rgba(0,0,0,0.35)] lg:w-[calc(100vw-220px-24px)]">
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[rgba(255,255,255,0.1)] bg-[#0b0c10]/86 px-5 py-[18px] backdrop-blur-md">
-          <h2 className="m-0 text-lg text-[#e9ecf1]">Periodic Table</h2>
-          <button onClick={onClose} className="cursor-pointer bg-transparent text-2xl leading-none text-[#e9ecf1] opacity-90 border-0">
+      <div className="h-screen w-full max-w-[880px] overflow-y-auto overflow-x-hidden border-r border-[rgba(255,255,255,0.1)] bg-[linear-gradient(180deg,rgba(18,20,28,0.98),rgba(11,12,16,0.98))] shadow-[10px_0_30px_rgba(0,0,0,0.35)] lg:w-[calc(100vw-220px-24px)]">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[rgba(255,255,255,0.1)] bg-[#0b0c10]/86 px-4 py-3 backdrop-blur-md sm:px-6 sm:py-5">
+          <h2 className="m-0 text-base text-[#e9ecf1] sm:text-xl">Periodic Table</h2>
+          <button onClick={onClose} className="cursor-pointer border-0 bg-transparent text-2xl leading-none text-[#e9ecf1] opacity-90 transition-opacity hover:opacity-100 sm:text-3xl">
             ×
           </button>
         </div>
-        <div className="grid grid-cols-18 gap-1 p-4 pb-3 sm:gap-[3px] sm:px-2.5 sm:pt-4">{cells}</div>
+        
+        <div className="w-full overflow-x-auto pb-6">
+          <div className="min-w-[640px] p-3 sm:min-w-0 sm:p-5 md:p-6">
+            <div className="grid grid-cols-18 gap-[3px] sm:gap-1.5 md:gap-2">
+              {cells}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
