@@ -3,3 +3,8 @@ node_modules
 .vs
 .vscode
 *.env*
+.idea/
+*.slnx
+.slnx
+.DS_Store
+dist/
